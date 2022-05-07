@@ -69,8 +69,8 @@
                 {
                         var locationLine = ((LocationCurve)glassWall.Location).Curve;
                         var locationDir = (locationLine.GetEndPoint(1) - locationLine.GetEndPoint(0)).Normalize();
-                        var centralPoint = locationLine.Evaluate(locationLine.ApproximateLength, false);
-                        var centralPointUp = centralPoint + (XYZ.BasisZ * 100.MmToFt());
+                        var centralPoint = locationLine.GetEndPoint(0) + (locationDir * locationLine.ApproximateLength / 2);
+                        var centralPointUp = centralPoint + (XYZ.BasisZ * 500.MmToFt());
                         var firstDir = locationDir.CrossProduct(XYZ.BasisZ);
                         var secondDir = -firstDir;
                         firstLine = Line.CreateBound(centralPointUp, centralPointUp + (firstDir * RayLength));
@@ -81,7 +81,7 @@
                 {
                         var locationPoint = ((LocationPoint)familyInstance.Location).Point;
                         var fistDirection = familyInstance.FacingOrientation;
-                        var upLocPoint = locationPoint + (XYZ.BasisZ * 100.MmToFt());
+                        var upLocPoint = locationPoint + (XYZ.BasisZ * 500.MmToFt());
                         firstLine = Line.CreateBound(upLocPoint, upLocPoint + (fistDirection * RayLength));
                         secondLine = Line.CreateBound(upLocPoint, upLocPoint - (fistDirection * RayLength));
                         break;

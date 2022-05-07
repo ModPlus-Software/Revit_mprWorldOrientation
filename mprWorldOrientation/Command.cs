@@ -6,7 +6,6 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using ModPlus_Revit;
 using ModPlusAPI.Windows;
-using ModPlusStyle.Controls;
 using mprWorldOrientation.ViewModels;
 using mprWorldOrientation.Views;
 
@@ -23,6 +22,7 @@ public class Command : IExternalCommand
 #if !DEBUG
             ModPlusAPI.Statistic.SendCommandStarting(new ModPlusConnector());
 #endif
+
             ModPlus.ShowModal(new MainWindow(new MainContext()));
             return Result.Succeeded;
         }

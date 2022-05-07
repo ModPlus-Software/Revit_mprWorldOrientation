@@ -129,4 +129,10 @@
 		</PackageReference>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Reference Include="RevitGeometryExporter">
+	    <HintPath>..\..\RevitExportGeometryToAutocad\RevitGeometryExporter\bin\Debug\RevitGeometryExporter.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
 </Project>

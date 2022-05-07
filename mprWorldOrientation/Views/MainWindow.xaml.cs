@@ -1,22 +1,21 @@
-﻿namespace mprWorldOrientation.Views
+﻿namespace mprWorldOrientation.Views;
+
+using mprWorldOrientation.ViewModels;
+
+/// <summary>
+/// Логика взаимодействия для MainWindow.xaml
+/// </summary>
+public partial class MainWindow
 {
-    using mprWorldOrientation.ViewModels;
-
     /// <summary>
-    /// Логика взаимодействия для MainWindow.xaml
+    /// ctor
     /// </summary>
-    public partial class MainWindow
+    /// <param name="mainContext">Основной контекст</param>
+    public MainWindow(MainContext mainContext)
     {
-        /// <summary>
-        /// ctor
-        /// </summary>
-        /// <param name="mainContext">Основной контекст</param>
-        public MainWindow(MainContext mainContext)
-        {
-            DataContext = mainContext;
-            InitializeComponent();
+        DataContext = mainContext;
+        InitializeComponent();
 
-            Title = ModPlusAPI.Language.GetPluginLocalName(ModPlusConnector.Instance);
-        }
+        Title = ModPlusAPI.Language.GetPluginLocalName(ModPlusConnector.Instance);
     }
 }

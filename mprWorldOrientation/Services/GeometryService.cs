@@ -2,6 +2,7 @@
 {
     using Autodesk.Revit.DB;
     using mprWorldOrientation.Models;
+    using System;
 
     /// <summary>
     /// Сервис по работе с ориентацией
@@ -23,7 +24,18 @@
                 ResultType = SolidCurveIntersectionMode.CurveSegmentsInside
             });
 
-            return intersectionResult.SegmentCount > 0;
+            if (intersectionResult.SegmentCount == 0)
+                return false;
+
+            var commonLength = 0d;
+            foreach (var segment in intersectionResult)
+            {
+                commonLength += segment.Length;
+            }
+
+            // в случаях с дуговыми объектами, предполагаем что если пересечение и найдено,
+            // но сумма длин сегментов меньше 70 процентов линии, то линия смотри наружу объекта и 
+            return line.ApproximateLength * 0.7 < commonLength;
         }
 
         /// <summary>

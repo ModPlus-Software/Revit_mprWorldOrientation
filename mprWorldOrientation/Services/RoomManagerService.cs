@@ -2,7 +2,8 @@
 {
     using System.Collections.Generic;
     using System.Linq;
-    using ModPlus_Revit.Utils;
+    using Autodesk.Revit.DB;
+    using ModPlusAPI;
     using ModPlusAPI.Services;
     using mprWorldOrientation.Extensions;
     using mprWorldOrientation.Models;
@@ -30,13 +31,10 @@
         /// <summary>
         /// Записывает значение парамера в зависимости от проемов
         /// </summary>
-        /// <param name="elementApplyFilterForElements">Фильтр по элементам</param>
-        /// <param name="elementApplyFilterForRooms">Фильтр по помещениям</param>
-        /// <param name="setParamName">Заполняемый параметр</param>
-        public void SetRoomParameters(
-            ElementApplyFilter elementApplyFilterForElements, ElementApplyFilter elementApplyFilterForRooms, string setParamName)
+        /// <param name="settings">Данные с настройками</param>
+        public void SetRoomParameters(SettingsData settings)
         {
-            var rooms = _getElementService.GetRoomWrapper(elementApplyFilterForRooms, elementApplyFilterForElements);
+            var rooms = _getElementService.GetRoomWrapper(settings);
 
             AnalyzeRoomPositions(rooms);
             var counturRooms = rooms.Where(i => i.IsCounturRoom).ToList();
@@ -46,20 +44,60 @@
                 var uniqueOrintationValues = GetWorldSideString(
                     room.DependentElements.Where(i => i.IsConturElement));
 
-                var param = room.RevitElement.GetParameterFromInstanceOrType(setParamName);
-                if (param == null)
+                if (settings.ElementApplyFilterForRooms.IsSetParamForElements 
+                    && !string.IsNullOrEmpty(settings.ElementApplyFilterForRooms.SetParameterName))
                 {
-                    _resultService.Add($"У элементов помещений нет параметрама {setParamName}, " +
-                        $"поэтому не возможно заполнить результаты анализа");
-                    return;
+                    SetParameter(
+                        room.RevitElement, 
+                        settings.ElementApplyFilterForRooms.SetParameterName.Trim(), 
+                        uniqueOrintationValues);
                 }
 
-                if (!param.SetParameterValue(uniqueOrintationValues))
+                foreach (var dependentElement in room.DependentElements)
                 {
-                    _resultService.Add($"Для элемента {room.RevitElement.Id.IntegerValue} " +
-                        $"не удалось заполнить парам. \"{setParamName}\" значениеим \"{uniqueOrintationValues}\". " +
-                        $"Проверьте тип запоняемого параметра. Он должен быть строковым");
+                    var equivalentSettingModel = settings.ElementsModels
+                        .FirstOrDefault(i => i.Filter.Categories.First().BuiltInCategory 
+                        == (BuiltInCategory)dependentElement.RevitElement.Category.Id.IntegerValue);
+
+                    if (equivalentSettingModel == null)
+                        continue;
+
+                    if (equivalentSettingModel.IsSetParamForElements
+                    && !string.IsNullOrEmpty(equivalentSettingModel.SetParameterName))
+                    {
+                        SetParameter(
+                        dependentElement.RevitElement,
+                        equivalentSettingModel.SetParameterName.Trim(),
+                        uniqueOrintationValues);
+                    }
                 }
+            }
+        }
+
+        private void SetParameter(Element element, string parameterName, object paramValue)
+        {
+            var param = element.GetParameterFromInstanceOrType(parameterName);
+            if (param == null)
+            {
+                /*
+                 * t1 У элементов помещений нет параметрама 
+                 * t2 поэтому не возможно заполнить результаты анализа
+                 */
+                _resultService.Add($"{Language.GetItem("t1")}{parameterName}, {Language.GetItem("t2")}");
+                return;
+            }
+
+            if (!param.SetParameterValue(paramValue))
+            {
+                /*
+                 * t3 Для элемента  
+                 * t4 не удалось заполнить парам. 
+                 * t5  значениеим 
+                 * t6 Проверьте тип запоняемого параметра. Он должен быть строковым
+                 */
+                _resultService.Add($"{Language.GetItem("t3")}{element.Id.IntegerValue} " +
+                    $"{Language.GetItem("t3")}\"{parameterName}\"{Language.GetItem("t5")}\"{paramValue}\". " +
+                    $"{Language.GetItem("t6")}");
             }
         }
 

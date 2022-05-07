@@ -5,7 +5,6 @@
     using Autodesk.Revit.DB;
     using Autodesk.Revit.DB.Architecture;
     using ModPlus_Revit;
-    using ModPlus_Revit.Utils;
     using mprWorldOrientation.Models;
 
     /// <summary>
@@ -28,32 +27,27 @@
         /// <summary>
         /// Получает обертки над помещениями
         /// </summary>
-        /// <param name="roomFilter">Фильтр</param>
-        /// <param name="elementsFilter">Фильтры для элементов</param>
+        /// <param name="settings">Данные с настройками</param>
         /// <returns>Список элементов</returns>
-        public List<RoomWrapper> GetRoomWrapper(ElementApplyFilter roomFilter, ElementApplyFilter elementsFilter)
+        public List<RoomWrapper> GetRoomWrapper(SettingsData settings)
         {
             var multiCategoryFilter = new ElementMulticategoryFilter(
-                    roomFilter.Categories.Select(i => i.BuiltInCategory)
+                    settings.ElementApplyFilterForRooms.Filter.Categories.Select(i => i.BuiltInCategory)
                     .ToList());
             var roomWrappers = new FilteredElementCollector(_doc).WhereElementIsNotElementType()
                 .WherePasses(multiCategoryFilter)
-                .Where(i => roomFilter.EqualityParameters.Any() ? roomFilter.IsMatch(i) : true)
+                .Where(i => settings.ElementApplyFilterForRooms.Filter.EqualityParameters.Any() 
+                ? settings.ElementApplyFilterForRooms.Filter.IsMatch(i)
+                : true)
                 .OfType<Room>()
                 .Select(i => new RoomWrapper(i))
                 .ToList();
-            roomWrappers.ForEach(i => i.DependentElements = GetRoomDependentElements(i, elementsFilter));
+            roomWrappers.ForEach(i => i.DependentElements = GetRoomDependentElements(i, settings));
             return roomWrappers;
         }
 
-        private List<ElementWrapper> GetRoomDependentElements(RoomWrapper roomWrapper, ElementApplyFilter filter)
+        private List<ElementWrapper> GetRoomDependentElements(RoomWrapper roomWrapper, SettingsData settings)
         {
-            var wallBuiltInCategory = BuiltInCategory.OST_Walls;
-            var allSelectedCategories = filter.Categories
-                .Select(i => i.BuiltInCategory).ToList();
-            var multiCategoryFilter = new ElementMulticategoryFilter(allSelectedCategories
-                .Where(i => i != wallBuiltInCategory).ToList());
-
             var allWalls = roomWrapper.RevitElement.GetBoundarySegments(
                 new SpatialElementBoundaryOptions
                 {
@@ -61,17 +55,33 @@
                 })
             .SelectMany(i => i.Select(w => _doc.GetElement(w.ElementId))).OfType<Wall>().ToList();
 
-            var glassWindow = allSelectedCategories.Contains(wallBuiltInCategory) ? 
+            var glassWindow = settings.ElementApplyFilterForGlassWalls.IsEnabled ? 
                 allWalls.Where(i => i.CurtainGrid != null)
-                .Where(i => filter.EqualityParameters.Any() ? filter.IsMatch(i) : true) 
+                .Where(i => settings.ElementApplyFilterForGlassWalls.Filter.EqualityParameters.Any()
+                ? settings.ElementApplyFilterForGlassWalls.Filter.IsMatch(i) 
+                : true) 
                 : new List<Wall>();
 
             var elements = allWalls.Where(i => i.CurtainGrid == null)
-            .SelectMany(i => i.GetDependentElements(multiCategoryFilter)).ToList()
-            .Select(id => _doc.GetElement(id))
-            .Where(i => filter.EqualityParameters.Any() ? filter.IsMatch(i) : true);
+            .SelectMany(i => i.GetDependentElements(null))
+            .Select(id => _doc.GetElement(id)).ToList();
 
-            return elements.Concat(glassWindow).Select(i => new ElementWrapper(i))
+            // todo не работают фильтры по IsMatch(), когда кол-во фильтров пустое
+            var doors = settings.ElementApplyFilterForDoors.IsEnabled ? elements
+                .Where(i => settings.ElementApplyFilterForDoors.Filter.Categories
+                .Select(c => c.BuiltInCategory).Contains((BuiltInCategory)i.Category.Id.IntegerValue))
+            .Where(i => settings.ElementApplyFilterForDoors.Filter.EqualityParameters.Any()
+                ? settings.ElementApplyFilterForDoors.Filter.IsMatch(i)
+                : true) : new List<Element>();
+
+            var windows = settings.ElementApplyFilterForDoors.IsEnabled ? elements
+                .Where(i => settings.ElementApplyFilterForWindows.Filter.Categories
+                .Select(c => c.BuiltInCategory).Contains((BuiltInCategory)i.Category.Id.IntegerValue))
+            .Where(i => settings.ElementApplyFilterForWindows.Filter.EqualityParameters.Any()
+                ? settings.ElementApplyFilterForWindows.Filter.IsMatch(i)
+                : true) : new List<Element>();
+
+            return doors.Concat(glassWindow).Concat(windows).Distinct().Select(i => new ElementWrapper(i))
                 .Where(i => i.Vectors.Any(l => _geometryService.HasLineSolidIntersection(l, roomWrapper.Solid)))
                 .ToList();
         }

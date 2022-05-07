@@ -1,8 +1,7 @@
-﻿using Autodesk.Revit.DB;
-using System.Collections.Generic;
-
-namespace mprWorldOrientation.Models
+﻿namespace mprWorldOrientation.Models
 {
+    using ModPlusAPI;
+
     /// <summary>
     /// Настройки для плагина
     /// </summary>
@@ -16,51 +15,49 @@ namespace mprWorldOrientation.Models
         /// <summary>
         /// Имя направления севера
         /// </summary>
-        public static string Nord => "С";
+        /// "C"
+        public static string Nord => Language.GetItem("s1");
 
         /// <summary>
         /// Имя направления юга
         /// </summary>
-        public static string South => "Ю";
+        /// "Ю"
+        public static string South => Language.GetItem("s2");
 
         /// <summary>
         /// Имя направления запада
         /// </summary>
-        public static string West => "З";
+        /// "З"
+        public static string West => Language.GetItem("s3");
 
         /// <summary>
         /// Имя направления востока
         /// </summary>
-        public static string East => "В";
+        /// "В"
+        public static string East => Language.GetItem("s4");
 
         /// <summary>
         /// Имя направления северо-запада
         /// </summary>
-        public static string NordWest => "СЗ";
+        /// "СЗ"
+        public static string NordWest => Language.GetItem("s5");
 
         /// <summary>
         /// Имя направления юго-запада
         /// </summary>
-        public static string SouthWest => "ЮЗ";
+        /// "ЮЗ"
+        public static string SouthWest => Language.GetItem("s6");
 
         /// <summary>
         /// Имя направления северо-востока
         /// </summary>
-        public static string NordEast => "СВ";
+        /// "СВ"
+        public static string NordEast => Language.GetItem("s7");
 
         /// <summary>
         /// Имя направления юго-востока
         /// </summary>
-        public static string SouthEast => "ЮВ";
-
-        /// <summary>
-        /// Категории доступные для выбора анализа элементов
-        /// </summary>
-        public static List<BuiltInCategory> ElementCategories => new List<BuiltInCategory>
-        {
-            BuiltInCategory.OST_Doors,
-            BuiltInCategory.OST_Windows,
-            BuiltInCategory.OST_Walls
-        };
+        /// "ЮВ"
+        public static string SouthEast => Language.GetItem("s8");
     }
 }

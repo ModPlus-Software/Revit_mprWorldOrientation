@@ -3,17 +3,21 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:mprWorldOrientation.Views"
+        xmlns:converters="clr-namespace:ModPlusAPI.Converters;assembly=ModPlusAPI"
         mc:Ignorable="d" SizeToContent="WidthAndHeight"
-        xmlns:vm="clr-namespace:mprWorldOrientation.ViewModels" xmlns:moduleControls="https://modplus.org/winfx/xaml/moduleControls" xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-                    d:DataContext="{d:DesignInstance vm:MainContext, IsDesignTimeCreatable=False}"
-        Title="MainWindow" MinHeight="150" MinWidth="150" MaxHeight="700" Name="Win">
+        xmlns:options="clr-namespace:mprWorldOrientation.Enums"
+        xmlns:vm="clr-namespace:mprWorldOrientation.ViewModels" 
+        xmlns:moduleControls="https://modplus.org/winfx/xaml/moduleControls"
+        xmlns:b="http://schemas.microsoft.com/xaml/behaviors" 
+        d:DataContext="{d:DesignInstance vm:MainContext, IsDesignTimeCreatable=False}"
+        Title="MainWindow" MinHeight="150" MinWidth="150" MaxHeight="700" Name="Win" MaxWidth="800">
 
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <converters:EnumToIntConverter x:Key="EnumToIntConverter" />
             <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mprJoin" />
             <XmlDataProvider x:Key="LangCommon" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/Common" />
         </ResourceDictionary>
@@ -28,6 +32,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -37,52 +42,204 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <!-- Шапка для фильтра-->
         <TextBlock 
             Grid.Row="0"
             Grid.Column="0"
             Grid.ColumnSpan="2"
-            Text="Фильтрация для помещений"/>
+            Text="{Binding Source={StaticResource Lang}, XPath=v6}"/>
+        <!--v6 Фильтрация для помещений-->
 
         <!-- Контрол фильтрами для элементов: помещений -->
         <moduleControls:ElementApplyFilterControl
                             Grid.Row="1"
-                            Grid.Column="0"
-                            Grid.ColumnSpan="2"
-                            Scope="{Binding ElementName=Win, Path=DataContext.ScopeForRoomFilter}"
-                            DataContext="{Binding ElementName=Win, Path=DataContext.ElementApplyFilterForRooms}"/>
+                            Grid.Column="1"
+                            Grid.ColumnSpan="3"
+                            VerticalAlignment="Center"
+                            Scope="{Binding ElementName=Win, Path=DataContext.FilterScope}"
+                            DataContext="{Binding ElementName=Win, Path=DataContext.ElementApplyFilterForRooms.Filter}"/>
 
+        <!-- Текст для ввода имени параметра -->
         <TextBlock 
             Grid.Row="2"
-            Text="Фильтрация для элементов"/>
-        
-        <!-- Контрол фильтрами для элементов: дверь, витраж, окна -->
-        <moduleControls:ElementApplyFilterControl
-                            Grid.Row="3"
-                            Grid.Column="0"
-                            Grid.ColumnSpan="2"
-                            DataContext="{Binding ElementName=Win, Path=DataContext.ElementApplyFilterForElements}"/>
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Text="{Binding Source={StaticResource Lang}, XPath=v1}"
+            ToolTip="{Binding Source={StaticResource Lang}, XPath=v2}"/>
+        <!--v1 Введите имя параметра:-->
+        <!--v2 Имя параметра для заполнения результатов анализа-->
 
+        <!-- Поле для ввода имени параметра -->
+        <TextBox 
+            Grid.Row="2"
+            Grid.Column="2"
+            MinWidth="50"
+            IsEnabled="{Binding ElementApplyFilterForRooms.IsSetParamForElements}"
+            Text="{Binding ElementApplyFilterForRooms.SetParameterName}"/>
+
+        <!-- Шапка для фильтра-->
         <TextBlock 
+            Grid.Row="3"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Text="{Binding Source={StaticResource Lang}, XPath=v3}"/>
+        <!--v3 Фильтрация для категории элементов дверей-->
+        
+        <!-- Контрол фильтрами для элементов: дверь-->
+        <moduleControls:ElementApplyFilterControl
+                            Grid.Row="4"
+                            Grid.Column="1"
+                            Grid.ColumnSpan="2"
+                            VerticalAlignment="Center"
+                            IsEnabled="{Binding ElementName=Win, Path=DataContext.ElementApplyFilterForDoors.IsEnabled}"
+                            Scope="{Binding ElementName=Win, Path=DataContext.FilterScope}"
+                            DataContext="{Binding ElementName=Win, Path=DataContext.ElementApplyFilterForDoors.Filter}"/>
+
+        <!-- Будет ли работать фильтр для данной категории -->
+        <CheckBox 
             Grid.Row="4"
             Grid.Column="0"
-            Text="Введите имя параметра:"
-            ToolTip="Имя параметра для заполнения результатов анализа"/>
+            VerticalAlignment="Center"
+            IsChecked="{Binding ElementApplyFilterForDoors.IsEnabled}"/>
 
-        <TextBox 
-            Grid.Row="4"
-            Grid.Column="1"
-            MinWidth="50"
-            Text="{Binding SetParameterName}"/>
-        <!-- Кнопка выполнения комманды-->
-        <Button
+        <!-- Текст для ввода имени параметра -->
+        <TextBlock 
             Grid.Row="5"
             Grid.Column="0"
             Grid.ColumnSpan="2"
-            Content="Выполнить"
+            Text="{Binding Source={StaticResource Lang}, XPath=v1}"
+            ToolTip="{Binding Source={StaticResource Lang}, XPath=v2}"/>
+        <!--v1 Введите имя параметра:-->
+        <!--v2 Имя параметра для заполнения результатов анализа-->
+
+        <!-- Поле для ввода имени параметра -->
+        <TextBox 
+            Grid.Row="5"
+            Grid.Column="2"
+            MinWidth="50"
+            IsEnabled="{Binding ElementApplyFilterForDoors.IsSetParamForElements}"
+            Text="{Binding ElementApplyFilterForDoors.SetParameterName}"/>
+
+        <TextBlock 
+            Grid.Row="6"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Text="{Binding Source={StaticResource Lang}, XPath=v4}"/>
+        <!--v4 Фильтрация для категории элементов окон-->
+
+        <!-- Контрол фильтрами для элементов: окна -->
+        <moduleControls:ElementApplyFilterControl
+                            Grid.Row="7"
+                            Grid.Column="1"
+                            Grid.ColumnSpan="2"
+                            VerticalAlignment="Center"
+                            IsEnabled="{Binding ElementName=Win, Path=DataContext.ElementApplyFilterForWindows.IsEnabled}"
+                            Scope="{Binding ElementName=Win, Path=DataContext.FilterScope}"
+                            DataContext="{Binding ElementName=Win, Path=DataContext.ElementApplyFilterForWindows.Filter}"/>
+
+        <!-- Будет ли работать фильтр для данной категории -->
+        <CheckBox 
+            Grid.Row="7"
+            Grid.Column="0"
+            VerticalAlignment="Center"
+            IsChecked="{Binding ElementApplyFilterForWindows.IsEnabled}"/>
+
+        <!-- Текст для ввода имени параметра -->
+        <TextBlock 
+            Grid.Row="8"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Text="{Binding Source={StaticResource Lang}, XPath=v1}"
+            ToolTip="{Binding Source={StaticResource Lang}, XPath=v2}"/>
+        <!--v1 Введите имя параметра:-->
+        <!--v2 Имя параметра для заполнения результатов анализа-->
+
+        <!-- Поле для ввода имени параметра -->
+        <TextBox 
+            Grid.Row="8"
+            Grid.Column="2"
+            MinWidth="50"
+            IsEnabled="{Binding ElementApplyFilterForWindows.IsSetParamForElements}"
+            Text="{Binding ElementApplyFilterForWindows.SetParameterName}"/>
+
+        <TextBlock 
+            Grid.Row="9"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Text="{Binding Source={StaticResource Lang}, XPath=v5}"/>
+        <!--v5 Фильтрация для категории элементов витражей-->
+
+        <!-- Контрол фильтрами для элементов: дверь, витраж, окна -->
+        <moduleControls:ElementApplyFilterControl
+                            Grid.Row="10"
+                            Grid.Column="1"
+                            Grid.ColumnSpan="2"
+                            VerticalAlignment="Center"
+                            IsEnabled="{Binding ElementName=Win, Path=DataContext.ElementApplyFilterForGlassWalls.IsEnabled}"
+                            Scope="{Binding ElementName=Win, Path=DataContext.FilterScope}"
+                            DataContext="{Binding ElementName=Win, Path=DataContext.ElementApplyFilterForGlassWalls.Filter}"/>
+
+        <!-- Будет ли работать фильтр для данной категории -->
+        <CheckBox 
+            Grid.Row="10"
+            Grid.Column="0"
+            VerticalAlignment="Center"
+            IsChecked="{Binding ElementApplyFilterForGlassWalls.IsEnabled}"/>
+
+        <!-- Текст для ввода имени параметра -->
+        <TextBlock 
+            Grid.Row="11"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Text="{Binding Source={StaticResource Lang}, XPath=v1}"
+            ToolTip="{Binding Source={StaticResource Lang}, XPath=v2}"/>
+        <!--v1 Введите имя параметра:-->
+        <!--v2 Имя параметра для заполнения результатов анализа-->
+
+        <!-- Поле для ввода имени параметра -->
+        <TextBox 
+            Grid.Row="11"
+            Grid.Column="2"
+            MinWidth="50"
+            IsEnabled="{Binding ElementApplyFilterForGlassWalls.IsSetParamForElements}"
+            Text="{Binding ElementApplyFilterForGlassWalls.SetParameterName}"/>
+
+        <ComboBox
+            Grid.Row="12"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            SelectedIndex="{Binding SetParameterType, 
+                Converter={StaticResource EnumToIntConverter}, 
+                ConverterParameter={x:Type options:SetParameterType}, 
+                Mode=TwoWay}"
+            HorizontalAlignment="Left"
+            ToolTip="Варианты для записи значений анализа в параметры элементов">
+            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=v7}" />
+            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=v8}" />
+            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=v9}" />
+            <!--v7 Для помещенй-->
+            <!--v8 Для элементов-->
+            <!--v9 Для обоих-->
+        </ComboBox>
+
+        <!-- Кнопка выполнения комманды-->
+        <Button
+            Grid.Row="12"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            Content="{Binding Source={StaticResource LangCommon}, XPath=create}"
             VerticalAlignment="Bottom"
-            HorizontalAlignment="Center"
+            HorizontalAlignment="Right"
             CommandParameter="{Binding ElementName=Win}"
             Command="{Binding ExecuteCommand}"/>
     </Grid>
