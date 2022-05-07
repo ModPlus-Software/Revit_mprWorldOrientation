@@ -8,6 +8,13 @@ using ModPlusAPI.Enums;
 /// <inheritdoc />
 public class ModPlusConnector : IModPlusPlugin
 {
+    private static ModPlusConnector _instance;
+
+    /// <summary>
+    /// Singleton instance
+    /// </summary>
+    public static ModPlusConnector Instance => _instance ??= new ModPlusConnector();
+
     /// <inheritdoc />
     public SupportedProduct SupportedProduct => SupportedProduct.Revit;
 

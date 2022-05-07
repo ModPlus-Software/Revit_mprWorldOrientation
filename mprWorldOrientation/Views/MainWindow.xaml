@@ -1,0 +1,89 @@
+﻿<mps:ModPlusWindow  xmlns:mps="https://modplus.org/winfx/xaml/controls" x:Class="mprWorldOrientation.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:mprWorldOrientation.Views"
+        mc:Ignorable="d" SizeToContent="WidthAndHeight"
+        xmlns:vm="clr-namespace:mprWorldOrientation.ViewModels" xmlns:moduleControls="https://modplus.org/winfx/xaml/moduleControls" xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+                    d:DataContext="{d:DesignInstance vm:MainContext, IsDesignTimeCreatable=False}"
+        Title="MainWindow" MinHeight="150" MinWidth="150" MaxHeight="700" Name="Win">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mprJoin" />
+            <XmlDataProvider x:Key="LangCommon" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/Common" />
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <b:Interaction.Triggers>
+        <b:EventTrigger EventName="Closing">
+            <b:InvokeCommandAction Command="{Binding Path=OnClosingCommand}" />
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock 
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Text="Фильтрация для помещений"/>
+
+        <!-- Контрол фильтрами для элементов: помещений -->
+        <moduleControls:ElementApplyFilterControl
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Grid.ColumnSpan="2"
+                            Scope="{Binding ElementName=Win, Path=DataContext.ScopeForRoomFilter}"
+                            DataContext="{Binding ElementName=Win, Path=DataContext.ElementApplyFilterForRooms}"/>
+
+        <TextBlock 
+            Grid.Row="2"
+            Text="Фильтрация для элементов"/>
+        
+        <!-- Контрол фильтрами для элементов: дверь, витраж, окна -->
+        <moduleControls:ElementApplyFilterControl
+                            Grid.Row="3"
+                            Grid.Column="0"
+                            Grid.ColumnSpan="2"
+                            DataContext="{Binding ElementName=Win, Path=DataContext.ElementApplyFilterForElements}"/>
+
+        <TextBlock 
+            Grid.Row="4"
+            Grid.Column="0"
+            Text="Введите имя параметра:"
+            ToolTip="Имя параметра для заполнения результатов анализа"/>
+
+        <TextBox 
+            Grid.Row="4"
+            Grid.Column="1"
+            MinWidth="50"
+            Text="{Binding SetParameterName}"/>
+        <!-- Кнопка выполнения комманды-->
+        <Button
+            Grid.Row="5"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Content="Выполнить"
+            VerticalAlignment="Bottom"
+            HorizontalAlignment="Center"
+            CommandParameter="{Binding ElementName=Win}"
+            Command="{Binding ExecuteCommand}"/>
+    </Grid>
+</mps:ModPlusWindow>

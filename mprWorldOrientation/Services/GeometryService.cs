@@ -1,0 +1,62 @@
+﻿namespace mprWorldOrientation.Services
+{
+    using Autodesk.Revit.DB;
+    using mprWorldOrientation.Models;
+
+    /// <summary>
+    /// Сервис по работе с ориентацией
+    /// </summary>
+    public class GeometryService
+    {
+        /// <summary>
+        /// Имеется ли пересечение между линией и солидом
+        /// </summary>
+        /// <param name="line">Линия</param>
+        /// <param name="solid">Солид</param>
+        public bool HasLineSolidIntersection(Line line, Solid solid)
+        {
+            if (line == null || solid == null)
+                return false;
+
+            var intersectionResult = solid.IntersectWithCurve(line, new SolidCurveIntersectionOptions()
+            {
+                ResultType = SolidCurveIntersectionMode.CurveSegmentsInside
+            });
+
+            return intersectionResult.SegmentCount > 0;
+        }
+
+        /// <summary>
+        /// Определить сторону света по вектору
+        /// </summary>
+        /// <param name="vector">Вектор напраления отверстия наружу</param>
+        /// <returns>Сторона света</returns>
+        public string WorldDirectionByVector(XYZ vector)
+        {
+            if (vector.IsAlmostEqualTo(XYZ.BasisY, PluginSettings.Tolerance))
+                return PluginSettings.Nord;
+            if (vector.IsAlmostEqualTo(-XYZ.BasisY, PluginSettings.Tolerance))
+                return PluginSettings.South;
+            if (vector.IsAlmostEqualTo(XYZ.BasisX, PluginSettings.Tolerance))
+                return PluginSettings.East;
+            if (vector.IsAlmostEqualTo(-XYZ.BasisX, PluginSettings.Tolerance))
+                return PluginSettings.West;
+            if (vector.X < 0)
+            {
+                if (vector.Y > 0)
+                    return PluginSettings.NordWest;
+                if (vector.Y < 0)
+                    return PluginSettings.SouthWest;
+            }
+            else
+            {
+                if (vector.Y > 0)
+                    return PluginSettings.NordEast;
+                if (vector.Y < 0)
+                    return PluginSettings.SouthEast;
+            }
+
+            return string.Empty;
+        }
+    }
+}

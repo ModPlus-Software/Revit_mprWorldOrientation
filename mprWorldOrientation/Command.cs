@@ -7,6 +7,8 @@ using Autodesk.Revit.UI;
 using ModPlus_Revit;
 using ModPlusAPI.Windows;
 using ModPlusStyle.Controls;
+using mprWorldOrientation.ViewModels;
+using mprWorldOrientation.Views;
 
 /// <inheritdoc />
 [Regeneration(RegenerationOption.Manual)]
@@ -21,7 +23,7 @@ public class Command : IExternalCommand
 #if !DEBUG
             ModPlusAPI.Statistic.SendCommandStarting(new ModPlusConnector());
 #endif
-            ModPlus.ShowModal(new ModPlusWindow());
+            ModPlus.ShowModal(new MainWindow(new MainContext()));
             return Result.Succeeded;
         }
         catch (Autodesk.Revit.Exceptions.OperationCanceledException)
