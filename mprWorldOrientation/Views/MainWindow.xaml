@@ -3,6 +3,7 @@
                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
                    xmlns:converters="clr-namespace:ModPlusAPI.Converters;assembly=ModPlusAPI"
+                   xmlns:controls="clr-namespace:mprWorldOrientation.Views.Controls"
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:moduleControls="https://modplus.org/winfx/xaml/moduleControls"
@@ -190,14 +191,16 @@
             </TextBox.IsEnabled>
         </TextBox>
 
+
         <!-- Кнопка выполнения команды -->
-        <Button Grid.Row="7"
+        <controls:SelectionOptionsButtonControl 
+            Grid.Row="7"
                 Grid.Column="0"
                 Grid.ColumnSpan="4"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Bottom"
-                Command="{Binding Path=ExecuteCommand}"
-                CommandParameter="{Binding ElementName=Win}"
-                Content="{Binding Source={StaticResource LangCommon}, XPath=continue}" />
+                IsEnabled="{Binding IsCommandEnable}"
+                ButtonText="{Binding Source={StaticResource LangCommon}, XPath=execute}"
+                ExecuteCommand="{Binding Path=ExecuteCommand}" />
     </Grid>
 </mps:ModPlusWindow>

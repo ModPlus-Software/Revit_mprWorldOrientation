@@ -8,6 +8,7 @@ using Models;
 using ModPlusAPI;
 using ModPlusAPI.Enums;
 using ModPlusAPI.Services;
+using mprWorldOrientation.Enums;
 
 /// <summary>
 /// Сервис по работе с помещениями
@@ -33,9 +34,10 @@ public class RoomManagerService
     /// Записывает значение параметра в зависимости от проемов
     /// </summary>
     /// <param name="settings">Данные с настройками</param>
-    public void SetRoomParameters(SettingsData settings)
+    /// <param name="scopeType">Параметры для выбора элементов</param>
+    public void SetRoomParameters(SettingsData settings, ScopeType scopeType)
     {
-        var rooms = _getElementService.GetRoomWrapper(settings);
+        var rooms = _getElementService.GetRoomWrapper(settings, scopeType);
 
         AnalyzeRoomPositions(rooms);
         var contourRooms = rooms.Where(i => i.IsCounturRoom).ToList();
@@ -97,10 +99,9 @@ public class RoomManagerService
     /// <param name="rooms">Список оберток стен</param>
     private void AnalyzeRoomPositions(List<RoomWrapper> rooms)
     {
+        var solids = _getElementService.GetAllRooms().Select(i => i.Solid).ToList();
         foreach (var room in rooms)
         {
-            var solids = rooms.Select(i => i.Solid).ToList();
-
             foreach (var depElement in room.DependentElements)
             {
                 depElement.HasFirstVectorIntersectedRoom = 

@@ -1,0 +1,57 @@
+﻿<UserControl x:Class="mprWorldOrientation.Views.Controls.SelectionOptionsButtonControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mps="https://modplus.org/winfx/xaml/controls"
+             xmlns:options="clr-namespace:mprWorldOrientation.Enums"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             Name="ThisControl">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mprWorldOrientation" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Button Name="Button"
+                VerticalAlignment="{Binding ElementName=ThisControl, Path=VerticalAlignment}"
+                HorizontalAlignment="{Binding ElementName=ThisControl, Path=HorizontalAlignment}"
+                Click="Button_OnClick"
+                Content="{Binding ElementName=ThisControl, Path=ButtonText}" />
+        <Popup Name="Popup"
+               AllowsTransparency="True"
+               Placement="Top"
+               PlacementTarget="{Binding ElementName=Button}"
+               StaysOpen="False"
+               VerticalOffset="-4">
+            <mps:Card>
+                <ItemsControl>
+                    <Button HorizontalAlignment="Stretch"
+                            Click="ClosePopup_OnClick"
+                            Command="{Binding ElementName=ThisControl, Path=ExecuteCommand}"
+                            CommandParameter="{x:Static options:ScopeType.SelectedElement}"
+                            Content="{Binding Source={StaticResource Lang}, XPath=h1}"
+                            Style="{StaticResource ModPlusFlatButton}" />
+                    <Button HorizontalAlignment="Stretch"
+                            Click="ClosePopup_OnClick"
+                            Command="{Binding ElementName=ThisControl, Path=ExecuteCommand}"
+                            CommandParameter="{x:Static options:ScopeType.InActiveView}"
+                            Content="{Binding Source={StaticResource Lang}, XPath=h2}"
+                            Style="{StaticResource ModPlusFlatButton}" />
+                    <Button HorizontalAlignment="Stretch"
+                            Click="ClosePopup_OnClick"
+                            Command="{Binding ElementName=ThisControl, Path=ExecuteCommand}"
+                            CommandParameter="{x:Static options:ScopeType.InProject}"
+                            Content="{Binding Source={StaticResource Lang}, XPath=h3}"
+                            Style="{StaticResource ModPlusFlatButton}" />
+                </ItemsControl>
+            </mps:Card>
+        </Popup>
+    </Grid>
+</UserControl>

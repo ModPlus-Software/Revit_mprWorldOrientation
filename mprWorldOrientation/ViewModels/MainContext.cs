@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
 using Autodesk.Revit.DB;
 using ModPlus_Revit;
@@ -19,19 +20,22 @@ using mprWorldOrientation.Services;
 /// <summary>
 /// Основной контекст
 /// </summary>
-public class MainContext
+public class MainContext : ObservableObject
 {
     private readonly Document _doc;
     private readonly UserSettingsService _userSettingsService;
     private readonly ResultService _resultService;
     private readonly RoomManagerService _roomManagerService;
     private readonly List<UserSettingsModel> _elementsSettingsModels;
+    private readonly ModPlusWindow _window;
 
     /// <summary>
     /// ctor
     /// </summary>
-    public MainContext()
+    /// <param name="modPlusWindow">Окно</param>
+    public MainContext(ModPlusWindow modPlusWindow)
     {
+        _window = modPlusWindow;
         _resultService = new ResultService();
         _doc = ModPlus.UiApplication.ActiveUIDocument.Document;
         _roomManagerService = new RoomManagerService(_resultService);
@@ -69,6 +73,11 @@ public class MainContext
         {
             ElementApplyFilterForDoors, ElementApplyFilterForWindows, ElementApplyFilterForGlassWalls
         };
+
+        _elementsSettingsModels.ForEach(i => i.EnableChanged += () =>
+        {
+            OnPropertyChanged(nameof(IsCommandEnable));
+        });
     }
 
     /// <summary>
@@ -126,9 +135,14 @@ public class MainContext
     }
 
     /// <summary>
+    /// Доступна ли команда к выполнению
+    /// </summary>
+    public bool IsCommandEnable => _elementsSettingsModels.Any(i => i.IsEnabled);
+
+    /// <summary>
     /// Выполнить
     /// </summary>
-    public ICommand ExecuteCommand => new RelayCommand<ModPlusWindow>(Execute);
+    public ICommand ExecuteCommand => new RelayCommand<ScopeType>(Execute, _ => IsCommandEnable);
 
     /// <summary>
     /// Закрытие
@@ -142,9 +156,9 @@ public class MainContext
             _userSettingsService.Set(ElementApplyFilterForRooms, nameof(ElementApplyFilterForRooms));
         }));
 
-    private void Execute(ModPlusWindow win)
+    private void Execute(ScopeType scopeType)
     {
-        win.Hide();
+        _window.Hide();
 
         // tr1 Определение направление проемов
         var transaction = new Transaction(_doc, Language.GetItem("tr1"));
@@ -160,12 +174,12 @@ public class MainContext
                     ElementApplyFilterForRooms = ElementApplyFilterForRooms,
                     ElementsModels = _elementsSettingsModels
                 };
-                _roomManagerService.SetRoomParameters(settingsData);
+                _roomManagerService.SetRoomParameters(settingsData, scopeType);
                 transaction.Commit();
                 if (_resultService.Count(ModPlusAPI.Enums.ResultItemType.Info) > 0)
                     _resultService.Show();
             },
             () => transaction.RollBack(),
-            () => win.Close());
+            () => _window.Close());
     }
 }

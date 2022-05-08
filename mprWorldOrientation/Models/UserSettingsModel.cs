@@ -2,6 +2,7 @@
 
 using ModPlus_Revit.Utils;
 using ModPlusAPI.Mvvm;
+using System;
 
 /// <summary>
 /// Модель пользовательских настроек
@@ -19,6 +20,11 @@ public class UserSettingsModel : ObservableObject
     {
         Filter = new ElementApplyFilter();
     }
+
+    /// <summary>
+    /// Событие возникаемое при изменении доступности
+    /// </summary>
+    public event Action EnableChanged;
 
     /// <summary>
     /// Фильтры для элементов
@@ -47,6 +53,7 @@ public class UserSettingsModel : ObservableObject
         set
         {
             _isEnable = value;
+            EnableChanged?.Invoke();
             OnPropertyChanged();
         }
     }
