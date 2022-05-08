@@ -1,67 +1,66 @@
-﻿namespace mprWorldOrientation.Models
+﻿namespace mprWorldOrientation.Models;
+
+using ModPlus_Revit.Utils;
+using ModPlusAPI.Mvvm;
+
+/// <summary>
+/// Модель пользовательских настроек
+/// </summary>
+public class UserSettingsModel : ObservableObject
 {
-    using ModPlus_Revit.Utils;
-    using ModPlusAPI.Mvvm;
+    private string _setParamName;
+    private bool _isEnable;
+    private bool _isSetParamValue;
 
     /// <summary>
-    /// Модель пользовательских настроек
+    /// ctor
     /// </summary>
-    public class UserSettingsModel : ObservableObject
+    public UserSettingsModel()
     {
-        private string _setParamName;
-        private bool _isEnable;
-        private bool _isSetParamValue;
+        Filter = new ElementApplyFilter();
+    }
 
-        /// <summary>
-        /// ctor
-        /// </summary>
-        public UserSettingsModel()
+    /// <summary>
+    /// Фильтры для элементов
+    /// </summary>
+    public ElementApplyFilter Filter { get; set; }
+
+    /// <summary>
+    /// Имя устанавливаемого параметра
+    /// </summary>
+    public string SetParameterName
+    {
+        get => _setParamName;
+        set
         {
-            Filter = new ElementApplyFilter();
+            _setParamName = value;
+            OnPropertyChanged();
         }
+    }
 
-        /// <summary>
-        /// Фильтры для элементов
-        /// </summary>
-        public ElementApplyFilter Filter { get; set; }
-
-        /// <summary>
-        /// Имя устанавливаемого параметра
-        /// </summary>
-        public string SetParameterName
+    /// <summary>
+    /// Применен ли данный фильтр
+    /// </summary>
+    public bool IsEnabled
+    {
+        get => _isEnable;
+        set
         {
-            get => _setParamName;
-            set
-            {
-                _setParamName = value;
-                OnPropertyChanged();
-            }
+            _isEnable = value;
+            OnPropertyChanged();
         }
+    }
 
-        /// <summary>
-        /// Применен ли данный фильтр
-        /// </summary>
-        public bool IsEnabled
+    /// <summary>
+    /// Записывать ли в элементы результаты анализа
+    /// </summary>
+    public bool IsSetParamForElements
+    {
+        get => _isSetParamValue;
+        set
         {
-            get => _isEnable;
-            set
-            {
-                _isEnable = value;
-                OnPropertyChanged();
-            }
-        }
-
-        /// <summary>
-        /// Записывать ли в элементы результаты анализа
-        /// </summary>
-        public bool IsSetParamForElements
-        {
-            get => _isSetParamValue;
-            set
-            {
-                _isSetParamValue = value;
-                OnPropertyChanged();
-            }
+            _isSetParamValue = value;
+            OnPropertyChanged();
         }
     }
 }

@@ -6,8 +6,8 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using ModPlus_Revit;
 using ModPlusAPI.Windows;
-using mprWorldOrientation.ViewModels;
-using mprWorldOrientation.Views;
+using ViewModels;
+using Views;
 
 /// <inheritdoc />
 [Regeneration(RegenerationOption.Manual)]
