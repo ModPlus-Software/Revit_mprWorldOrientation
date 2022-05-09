@@ -65,6 +65,8 @@ public class MainContext : ObservableObject
         {
             OnPropertyChanged(nameof(IsCommandEnable));
         });
+
+        SetParameterType = SetParameterType;
     }
 
     /// <summary>

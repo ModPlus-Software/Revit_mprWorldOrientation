@@ -2,12 +2,26 @@
 
 using Autodesk.Revit.DB;
 using Models;
+using ModPlus_Revit;
+using System;
+using System.Linq;
 
 /// <summary>
 /// Сервис по работе с ориентацией
 /// </summary>
 public class GeometryService
 {
+    private Lazy<Transform> _transform;
+
+    /// <summary>
+    /// ctor
+    /// </summary>
+    public GeometryService()
+    {
+        var doc = ModPlus.UiApplication.ActiveUIDocument.Document;
+        _transform = new Lazy<Transform>(() => GetTransform(doc));
+    }
+
     /// <summary>
     /// Имеется ли пересечение между линией и солидом
     /// </summary>
@@ -44,6 +58,7 @@ public class GeometryService
     /// <returns>Сторона света</returns>
     public string WorldDirectionByVector(XYZ vector)
     {
+        vector = _transform.Value.OfVector(vector);
         if (vector.IsAlmostEqualTo(XYZ.BasisY, PluginSettings.Tolerance))
             return PluginSettings.North;
         if (vector.IsAlmostEqualTo(-XYZ.BasisY, PluginSettings.Tolerance))
@@ -68,5 +83,15 @@ public class GeometryService
         }
 
         return string.Empty;
+    }
+
+    private Transform GetTransform(Document doc)
+    {
+        var angle = new FilteredElementCollector(doc)
+           .OfCategory(BuiltInCategory.OST_ProjectBasePoint)
+           .Cast<BasePoint>()
+           .First()
+           .get_Parameter(BuiltInParameter.BASEPOINT_ANGLETON_PARAM).AsDouble();
+        return Transform.CreateRotation(XYZ.BasisZ, -angle);
     }
 }
