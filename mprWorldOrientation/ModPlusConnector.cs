@@ -20,14 +20,8 @@ public class ModPlusConnector : IModPlusPlugin
 
     /// <inheritdoc/>
     public string Name => nameof(mprWorldOrientation);
-
-#if R2017
-    /// <inheritdoc />
-    public string AvailProductExternalVersion => "2017";
-#elif R2018
-    /// <inheritdoc />
-    public string AvailProductExternalVersion => "2018";
-#elif R2019
+    
+#if R2019
     /// <inheritdoc />
     public string AvailProductExternalVersion => "2019";
 #elif R2020
