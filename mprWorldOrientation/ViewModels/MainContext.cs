@@ -43,31 +43,19 @@ public class MainContext : ObservableObject
 
         ElementApplyFilterForDoors = _userSettingsService
             .Get<UserSettingsModel>(nameof(ElementApplyFilterForDoors));
-        ElementApplyFilterForDoors.Filter.Categories = new ObservableCollection<RevitBuiltInCategory>
-        {
-            new (BuiltInCategory.OST_Doors)
-        };
+        ElementApplyFilterForDoors.Category = new RevitBuiltInCategory(BuiltInCategory.OST_Doors);
 
         ElementApplyFilterForWindows = _userSettingsService
             .Get<UserSettingsModel>(nameof(ElementApplyFilterForWindows));
-        ElementApplyFilterForWindows.Filter.Categories = new ObservableCollection<RevitBuiltInCategory>
-        {
-            new (BuiltInCategory.OST_Windows)
-        };
+        ElementApplyFilterForWindows.Category = new RevitBuiltInCategory(BuiltInCategory.OST_Windows);
 
         ElementApplyFilterForGlassWalls = _userSettingsService
             .Get<UserSettingsModel>(nameof(ElementApplyFilterForGlassWalls));
-        ElementApplyFilterForGlassWalls.Filter.Categories = new ObservableCollection<RevitBuiltInCategory>
-        {
-            new (BuiltInCategory.OST_Walls)
-        };
+        ElementApplyFilterForGlassWalls.Category = new RevitBuiltInCategory(BuiltInCategory.OST_Walls);
 
         ElementApplyFilterForRooms = _userSettingsService
             .Get<UserSettingsModel>(nameof(ElementApplyFilterForRooms));
-        ElementApplyFilterForRooms.Filter.Categories = new ObservableCollection<RevitBuiltInCategory>
-        {
-            new (BuiltInCategory.OST_Rooms)
-        };
+        ElementApplyFilterForRooms.Category = new RevitBuiltInCategory(BuiltInCategory.OST_Rooms);
 
         _elementsSettingsModels = new List<UserSettingsModel>
         {
@@ -176,8 +164,9 @@ public class MainContext : ObservableObject
                 };
                 _roomManagerService.SetRoomParameters(settingsData, scopeType);
                 transaction.Commit();
-                if (_resultService.Count(ModPlusAPI.Enums.ResultItemType.Info) > 0)
-                    _resultService.Show();
+                if (_resultService.Count(ModPlusAPI.Enums.ResultItemType.Error) > 0 
+                || _resultService.Count(ModPlusAPI.Enums.ResultItemType.Success) > 0)
+                    _resultService.Show(Language.GetItem("t5"));
             },
             () => transaction.RollBack(),
             () => _window.Close());

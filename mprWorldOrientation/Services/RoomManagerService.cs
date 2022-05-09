@@ -37,11 +37,17 @@ public class RoomManagerService
     /// <param name="scopeType">Параметры для выбора элементов</param>
     public void SetRoomParameters(SettingsData settings, ScopeType scopeType)
     {
+        var models = new List<UserSettingsModel>(settings.ElementsModels);
+        models.Add(settings.ElementApplyFilterForRooms);
+        models.ForEach(i => i.SetElementCount = 0);
         var rooms = _getElementService.GetRoomWrapper(settings, scopeType);
+        var a = Language.GetItem("t3");
+        _resultService.Add(string.Format(Language.GetItem("t3"), rooms.Count.ToString()), ResultItemType.Success);
 
         AnalyzeRoomPositions(rooms);
+
         var contourRooms = rooms.Where(i => i.IsCounturRoom).ToList();
-            
+
         foreach (var room in contourRooms)
         {
             var uniqueOrientationValues = GetWorldSideString(room.DependentElements.Where(i => i.IsContourElement));
@@ -49,10 +55,11 @@ public class RoomManagerService
             if (settings.ElementApplyFilterForRooms.IsSetParamForElements 
                 && !string.IsNullOrEmpty(settings.ElementApplyFilterForRooms.SetParameterName))
             {
-                SetParameter(
-                    room.RevitElement, 
-                    settings.ElementApplyFilterForRooms.SetParameterName.Trim(), 
-                    uniqueOrientationValues);
+                if (SetParameter(
+                    room.RevitElement,
+                    settings.ElementApplyFilterForRooms.SetParameterName.Trim(),
+                    uniqueOrientationValues))
+                    settings.ElementApplyFilterForRooms.SetElementCount++;
             }
 
             foreach (var dependentElement in room.DependentElements)
@@ -67,30 +74,57 @@ public class RoomManagerService
                 if (equivalentSettingModel.IsSetParamForElements
                     && !string.IsNullOrEmpty(equivalentSettingModel.SetParameterName))
                 {
-                    SetParameter(
+                    if (SetParameter(
                         dependentElement.RevitElement,
                         equivalentSettingModel.SetParameterName.Trim(),
-                        uniqueOrientationValues);
+                        uniqueOrientationValues))
+                    {
+                        equivalentSettingModel.SetElementCount++;
+                    }
                 }
+            }
+        }
+
+        foreach (var model in models)
+        {
+            if (model.IsSetParamForElements && !string.IsNullOrEmpty(model.SetParameterName))
+            {
+                _resultService.Add(
+                    string.Format(
+                        Language.GetItem("t4"),
+                        model.Category.DisplayName,
+                        model.SetElementCount.ToString()),
+                    ResultItemType.Success);
+            }
+            else if (model.IsSetParamForElements && string.IsNullOrEmpty(model.SetParameterName))
+            {
+                _resultService.Add(
+                    string.Format(
+                        Language.GetItem("t6"),
+                        model.Category.DisplayName),
+                    ResultItemType.Warning);
             }
         }
     }
 
-    private void SetParameter(Element element, string parameterName, object paramValue)
+    private bool SetParameter(Element element, string parameterName, object paramValue)
     {
         var param = element.GetParameterFromInstanceOrType(parameterName);
         if (param == null)
         {
             // У элементов помещений нет параметра "{0}", поэтому не возможно заполнить результаты анализа
             _resultService.Add(string.Format(Language.GetItem("t1"), parameterName), ResultItemType.Error);
-            return;
+            return false;
         }
 
         if (!param.SetParameterValue(paramValue))
         {
             // Не удалось задать значение параметру "{0}". Проверьте тип заполняемого параметра - он должен быть строковым
-            _resultService.Add(string.Format(Language.GetItem("t3"), parameterName), element.Id.ToString(), ResultItemType.Error);
+            _resultService.Add(string.Format(Language.GetItem("t2"), parameterName), element.Id.ToString(), ResultItemType.Error);
+            return false;
         }
+
+        return true;
     }
 
     /// <summary>
