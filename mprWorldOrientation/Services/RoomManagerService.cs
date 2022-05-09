@@ -8,7 +8,7 @@ using Models;
 using ModPlusAPI;
 using ModPlusAPI.Enums;
 using ModPlusAPI.Services;
-using mprWorldOrientation.Enums;
+using Enums;
 
 /// <summary>
 /// Сервис по работе с помещениями

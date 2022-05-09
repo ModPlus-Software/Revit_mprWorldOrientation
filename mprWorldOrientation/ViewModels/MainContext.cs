@@ -13,9 +13,9 @@ using ModPlusAPI;
 using ModPlusAPI.Mvvm;
 using ModPlusAPI.Services;
 using ModPlusStyle.Controls;
-using mprWorldOrientation.Enums;
-using mprWorldOrientation.Models;
-using mprWorldOrientation.Services;
+using Enums;
+using Models;
+using Services;
 
 /// <summary>
 /// Основной контекст
@@ -43,30 +43,30 @@ public class MainContext : ObservableObject
 
         ElementApplyFilterForDoors = _userSettingsService
             .Get<UserSettingsModel>(nameof(ElementApplyFilterForDoors));
-        ElementApplyFilterForDoors.Filter.Categories = new ObservableCollection<RevitBuiltInCategory>()
+        ElementApplyFilterForDoors.Filter.Categories = new ObservableCollection<RevitBuiltInCategory>
         {
-            new RevitBuiltInCategory(BuiltInCategory.OST_Doors)
+            new (BuiltInCategory.OST_Doors)
         };
 
         ElementApplyFilterForWindows = _userSettingsService
             .Get<UserSettingsModel>(nameof(ElementApplyFilterForWindows));
-        ElementApplyFilterForWindows.Filter.Categories = new ObservableCollection<RevitBuiltInCategory>()
+        ElementApplyFilterForWindows.Filter.Categories = new ObservableCollection<RevitBuiltInCategory>
         {
-            new RevitBuiltInCategory(BuiltInCategory.OST_Windows)
+            new (BuiltInCategory.OST_Windows)
         };
 
         ElementApplyFilterForGlassWalls = _userSettingsService
             .Get<UserSettingsModel>(nameof(ElementApplyFilterForGlassWalls));
-        ElementApplyFilterForGlassWalls.Filter.Categories = new ObservableCollection<RevitBuiltInCategory>()
+        ElementApplyFilterForGlassWalls.Filter.Categories = new ObservableCollection<RevitBuiltInCategory>
         {
-            new RevitBuiltInCategory(BuiltInCategory.OST_Walls)
+            new (BuiltInCategory.OST_Walls)
         };
 
         ElementApplyFilterForRooms = _userSettingsService
             .Get<UserSettingsModel>(nameof(ElementApplyFilterForRooms));
-        ElementApplyFilterForRooms.Filter.Categories = new ObservableCollection<RevitBuiltInCategory>()
+        ElementApplyFilterForRooms.Filter.Categories = new ObservableCollection<RevitBuiltInCategory>
         {
-            new RevitBuiltInCategory(BuiltInCategory.OST_Rooms)
+            new (BuiltInCategory.OST_Rooms)
         };
 
         _elementsSettingsModels = new List<UserSettingsModel>
@@ -166,7 +166,7 @@ public class MainContext : ObservableObject
         SafeExecute.Execute(
             () =>
             {
-                var settingsData = new SettingsData()
+                var settingsData = new SettingsData
                 {
                     ElementApplyFilterForDoors = ElementApplyFilterForDoors,
                     ElementApplyFilterForWindows = ElementApplyFilterForWindows,

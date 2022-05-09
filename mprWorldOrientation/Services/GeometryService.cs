@@ -1,7 +1,7 @@
 ﻿namespace mprWorldOrientation.Services;
 
 using Autodesk.Revit.DB;
-using mprWorldOrientation.Models;
+using Models;
 
 /// <summary>
 /// Сервис по работе с ориентацией
@@ -40,7 +40,7 @@ public class GeometryService
     /// <summary>
     /// Определить сторону света по вектору
     /// </summary>
-    /// <param name="vector">Вектор напраления отверстия наружу</param>
+    /// <param name="vector">Вектор направления отверстия наружу</param>
     /// <returns>Сторона света</returns>
     public string WorldDirectionByVector(XYZ vector)
     {
