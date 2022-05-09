@@ -132,4 +132,9 @@
 		</PackageReference>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Resource Include="Resources\mprWorldOrientation_16x16.png" />
+	  <Resource Include="Resources\mprWorldOrientation_32x32.png" />
+	</ItemGroup>
+
 </Project>
