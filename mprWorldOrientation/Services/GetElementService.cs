@@ -81,13 +81,16 @@ public class GetElementService
             .Select(id => _doc.GetElement(id)).ToList();
         
         var doors = settings.ElementApplyFilterForDoors.IsEnabled 
-            ? elements.Where(i => (BuiltInCategory)i.Category.Id.IntegerValue == settings.ElementApplyFilterForDoors.Category.BuiltInCategory)
+            ? elements
+            .Where(i => i.Category != null && i.Category.Id != ElementId.InvalidElementId)
+            .Where(i => (BuiltInCategory)i.Category.Id.IntegerValue == settings.ElementApplyFilterForDoors.Category.BuiltInCategory)
                 .Where(i => !settings.ElementApplyFilterForDoors.Filter.EqualityParameters.Any() || 
                             settings.ElementApplyFilterForDoors.Filter.IsMatch(i)) 
             : new List<Element>();
 
         var windows = settings.ElementApplyFilterForWindows.IsEnabled 
             ? elements
+            .Where(i => i.Category != null && i.Category.Id != ElementId.InvalidElementId)
                 .Where(i => (BuiltInCategory)i.Category.Id.IntegerValue == settings.ElementApplyFilterForWindows.Category.BuiltInCategory)
                 .Where(i => !settings.ElementApplyFilterForWindows.Filter.EqualityParameters.Any() ||
                             settings.ElementApplyFilterForWindows.Filter.IsMatch(i)) 

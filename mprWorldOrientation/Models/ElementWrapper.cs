@@ -70,7 +70,7 @@ public class ElementWrapper
                 var locationLine = ((LocationCurve)glassWall.Location).Curve;
                 var locationDir = (locationLine.GetEndPoint(1) - locationLine.GetEndPoint(0)).Normalize();
                 var centralPoint = locationLine.GetEndPoint(0) + (locationDir * locationLine.ApproximateLength / 2);
-                var centralPointUp = centralPoint + (XYZ.BasisZ * 500.MmToFt());
+                var centralPointUp = centralPoint + (XYZ.BasisZ * 1000.MmToFt());
                 var firstDir = locationDir.CrossProduct(XYZ.BasisZ);
                 var secondDir = -firstDir;
                 firstLine = Line.CreateBound(centralPointUp, centralPointUp + (firstDir * _rayLength));
@@ -82,7 +82,7 @@ public class ElementWrapper
             {
                 var locationPoint = ((LocationPoint)familyInstance.Location).Point;
                 var fistDirection = familyInstance.FacingOrientation;
-                var upLocPoint = locationPoint + (XYZ.BasisZ * 500.MmToFt());
+                var upLocPoint = locationPoint + (XYZ.BasisZ * 1000.MmToFt());
                 firstLine = Line.CreateBound(upLocPoint, upLocPoint + (fistDirection * _rayLength));
                 secondLine = Line.CreateBound(upLocPoint, upLocPoint - (fistDirection * _rayLength));
                 break;

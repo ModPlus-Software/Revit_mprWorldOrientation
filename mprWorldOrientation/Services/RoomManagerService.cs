@@ -70,7 +70,7 @@ public class RoomManagerService
             foreach (var dependentElement in room.DependentElements)
             {
                 var equivalentSettingModel = settings.ElementsModels.FirstOrDefault(i => 
-                    i.Filter.Categories.First().BuiltInCategory == (BuiltInCategory)dependentElement.RevitElement.Category.Id.IntegerValue);
+                    i.Category.BuiltInCategory == (BuiltInCategory)dependentElement.RevitElement.Category.Id.IntegerValue);
 
                 if (equivalentSettingModel == null)
                     continue;
@@ -99,15 +99,6 @@ public class RoomManagerService
                         model.Category.DisplayName,
                         model.SetElementCount.ToString()),
                     ResultItemType.Success);
-            }
-            else if (model.IsSetParamForElements && string.IsNullOrEmpty(model.SetParameterName))
-            {
-                // Для элементов категории "{0}" не задан целевой параметр для записи результат
-                _resultService.Add(
-                    string.Format(
-                        Language.GetItem("t6"),
-                        model.Category.DisplayName),
-                    ResultItemType.Warning);
             }
         }
     }
