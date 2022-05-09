@@ -81,42 +81,45 @@
 
 	<ItemGroup Condition="'$(Configuration)'=='R2017'">
 		<PackageReference Include="ModPlus.Revit.API.2017" Version="2.0.0" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlus.Revit.Module.2017" Version="11.0.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.Revit.Module.2017" Version="11.4.0" ExcludeAssets="runtime" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='R2018'">
 		<PackageReference Include="ModPlus.Revit.API.2018" Version="2.0.0" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlus.Revit.Module.2018" Version="11.0.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.Revit.Module.2018" Version="11.4.0" ExcludeAssets="runtime" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='R2019'">
 		<PackageReference Include="ModPlus.Revit.API.2019" Version="3.0.0" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlus.Revit.Module.2019" Version="11.0.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.Revit.Module.2019" Version="11.4.0" ExcludeAssets="runtime" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='R2020'">
 		<PackageReference Include="ModPlus.Revit.API.2020" Version="3.0.0" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlus.Revit.Module.2020" Version="11.0.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.Revit.Module.2020" Version="11.4.0" ExcludeAssets="runtime" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='R2021'">
 		<PackageReference Include="ModPlus.Revit.API.2021" Version="3.0.0" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlus.Revit.Module.2021" Version="11.0.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.Revit.Module.2021" Version="11.4.0" ExcludeAssets="runtime" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='R2022'">
 		<PackageReference Include="ModPlus.Revit.API.2022" Version="3.0.0" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlus.Revit.Module.2022" Version="11.0.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.Revit.Module.2022" Version="11.4.0" ExcludeAssets="runtime" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='R2023'">
 		<PackageReference Include="ModPlus.Revit.API.2023" Version="3.0.0" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlus.Revit.Module.2023" Version="11.0.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.Revit.Module.2023" Version="11.4.0" ExcludeAssets="runtime" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='Debug'">
 		<PackageReference Include="ModPlus.Revit.API.2023" Version="3.0.0" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlus.Revit.Module.2023" Version="11.0.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.Revit.Module.2023" Version="11.4.0" ExcludeAssets="runtime" />
+		<Reference Include="RevitGeometryExporter">
+			<HintPath>..\..\RevitExportGeometryToAutocad\RevitGeometryExporter\bin\Debug\RevitGeometryExporter.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 
 	<ItemGroup>

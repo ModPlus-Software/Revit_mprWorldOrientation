@@ -1,4 +1,4 @@
-﻿namespace mprWorldOrientation;
+﻿namespace mprWorldOrientation.Views;
 
 /// <summary>
 /// Логика взаимодействия для MainWindow.xaml
@@ -6,12 +6,12 @@
 public partial class MainWindow
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="MainWindow"/> class.
+    /// ctor
     /// </summary>
     public MainWindow()
     {
         InitializeComponent();
-        //// todo uncomment
-        ////Title = ModPlusAPI.Language.GetPluginLocalName(new ModPlusConnector());
+
+        Title = ModPlusAPI.Language.GetPluginLocalName(ModPlusConnector.Instance);
     }
 }

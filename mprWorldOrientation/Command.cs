@@ -6,7 +6,8 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using ModPlus_Revit;
 using ModPlusAPI.Windows;
-using ModPlusStyle.Controls;
+using ViewModels;
+using Views;
 
 /// <inheritdoc />
 [Regeneration(RegenerationOption.Manual)]
@@ -21,7 +22,9 @@ public class Command : IExternalCommand
 #if !DEBUG
             ModPlusAPI.Statistic.SendCommandStarting(new ModPlusConnector());
 #endif
-            ModPlus.ShowModal(new ModPlusWindow());
+            var window = new MainWindow();
+            window.DataContext = new MainContext(window);
+            ModPlus.ShowModal(window);
             return Result.Succeeded;
         }
         catch (Autodesk.Revit.Exceptions.OperationCanceledException)
