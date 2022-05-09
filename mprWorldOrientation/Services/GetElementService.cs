@@ -37,13 +37,9 @@ public class GetElementService
     /// <returns>Список элементов</returns>
     public List<RoomWrapper> GetRoomWrapper(SettingsData settings, ScopeType scopeType)
     {
-        var multiCategoryFilter = new ElementMulticategoryFilter(
-            settings.ElementApplyFilterForRooms.Filter.Categories.Select(i => i.BuiltInCategory)
-                .ToList());
         var roomWrappers = GetScopedCollector(scopeType).WhereElementIsNotElementType()
-            .WherePasses(multiCategoryFilter)
-            .Where(i => !settings.ElementApplyFilterForRooms.Filter.EqualityParameters.Any() || 
-                        settings.ElementApplyFilterForRooms.Filter.IsMatch(i))
+            .Where(i => settings.ElementApplyFilterForRooms.Filter.EqualityParameters.Any() ?
+                        settings.ElementApplyFilterForRooms.Filter.IsMatch(i) : true)
             .OfType<Room>()
             .Select(i => new RoomWrapper(i))
             .ToList();
@@ -85,16 +81,14 @@ public class GetElementService
             .Select(id => _doc.GetElement(id)).ToList();
         
         var doors = settings.ElementApplyFilterForDoors.IsEnabled 
-            ? elements.Where(i => settings.ElementApplyFilterForDoors.Filter.Categories
-                    .Select(c => c.BuiltInCategory).Contains((BuiltInCategory)i.Category.Id.IntegerValue))
+            ? elements.Where(i => (BuiltInCategory)i.Category.Id.IntegerValue == settings.ElementApplyFilterForDoors.Category.BuiltInCategory)
                 .Where(i => !settings.ElementApplyFilterForDoors.Filter.EqualityParameters.Any() || 
                             settings.ElementApplyFilterForDoors.Filter.IsMatch(i)) 
             : new List<Element>();
 
-        var windows = settings.ElementApplyFilterForDoors.IsEnabled 
+        var windows = settings.ElementApplyFilterForWindows.IsEnabled 
             ? elements
-                .Where(i => settings.ElementApplyFilterForWindows.Filter.Categories
-                    .Select(c => c.BuiltInCategory).Contains((BuiltInCategory)i.Category.Id.IntegerValue))
+                .Where(i => (BuiltInCategory)i.Category.Id.IntegerValue == settings.ElementApplyFilterForWindows.Category.BuiltInCategory)
                 .Where(i => !settings.ElementApplyFilterForWindows.Filter.EqualityParameters.Any() ||
                             settings.ElementApplyFilterForWindows.Filter.IsMatch(i)) 
             : new List<Element>();

@@ -1,5 +1,6 @@
 ﻿namespace mprWorldOrientation.Models;
 
+using ModPlus_Revit.Models;
 using ModPlus_Revit.Utils;
 using ModPlusAPI.Mvvm;
 using System;
@@ -30,6 +31,11 @@ public class UserSettingsModel : ObservableObject
     /// Фильтры для элементов
     /// </summary>
     public ElementApplyFilter Filter { get; set; }
+
+    /// <summary>
+    /// Категория
+    /// </summary>
+    public RevitBuiltInCategory Category { get; set; }
 
     /// <summary>
     /// Имя устанавливаемого параметра
@@ -70,4 +76,9 @@ public class UserSettingsModel : ObservableObject
             OnPropertyChanged();
         }
     }
+
+    /// <summary>
+    /// Кол-во элементов которым удалось установить параметры
+    /// </summary>
+    public int SetElementCount { get; set; }
 }
