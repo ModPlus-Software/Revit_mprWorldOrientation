@@ -37,11 +37,16 @@ public class RoomManagerService
     /// <param name="scopeType">Параметры для выбора элементов</param>
     public void SetRoomParameters(SettingsData settings, ScopeType scopeType)
     {
-        var models = new List<UserSettingsModel>(settings.ElementsModels);
-        models.Add(settings.ElementApplyFilterForRooms);
+        var models = new List<UserSettingsModel>(settings.ElementsModels)
+        {
+            settings.ElementApplyFilterForRooms
+        };
+
         models.ForEach(i => i.SetElementCount = 0);
+        
         var rooms = _getElementService.GetRoomWrapper(settings, scopeType);
-        var a = Language.GetItem("t3");
+
+        // Всего помещений найдено: {0}
         _resultService.Add(string.Format(Language.GetItem("t3"), rooms.Count.ToString()), ResultItemType.Success);
 
         AnalyzeRoomPositions(rooms);
@@ -52,8 +57,8 @@ public class RoomManagerService
         {
             var uniqueOrientationValues = GetWorldSideString(room.DependentElements.Where(i => i.IsContourElement));
 
-            if (settings.ElementApplyFilterForRooms.IsSetParamForElements 
-                && !string.IsNullOrEmpty(settings.ElementApplyFilterForRooms.SetParameterName))
+            if (settings.ElementApplyFilterForRooms.IsSetParamForElements && 
+                !string.IsNullOrEmpty(settings.ElementApplyFilterForRooms.SetParameterName))
             {
                 if (SetParameter(
                     room.RevitElement,
@@ -64,15 +69,13 @@ public class RoomManagerService
 
             foreach (var dependentElement in room.DependentElements)
             {
-                var equivalentSettingModel = settings.ElementsModels
-                    .FirstOrDefault(i => i.Filter.Categories.First().BuiltInCategory 
-                                         == (BuiltInCategory)dependentElement.RevitElement.Category.Id.IntegerValue);
+                var equivalentSettingModel = settings.ElementsModels.FirstOrDefault(i => 
+                    i.Filter.Categories.First().BuiltInCategory == (BuiltInCategory)dependentElement.RevitElement.Category.Id.IntegerValue);
 
                 if (equivalentSettingModel == null)
                     continue;
 
-                if (equivalentSettingModel.IsSetParamForElements
-                    && !string.IsNullOrEmpty(equivalentSettingModel.SetParameterName))
+                if (equivalentSettingModel.IsSetParamForElements && !string.IsNullOrEmpty(equivalentSettingModel.SetParameterName))
                 {
                     if (SetParameter(
                         dependentElement.RevitElement,
@@ -89,6 +92,7 @@ public class RoomManagerService
         {
             if (model.IsSetParamForElements && !string.IsNullOrEmpty(model.SetParameterName))
             {
+                // Всего элементов категории "{0}", после анализа которым присвоено значение: {1}
                 _resultService.Add(
                     string.Format(
                         Language.GetItem("t4"),
@@ -98,6 +102,7 @@ public class RoomManagerService
             }
             else if (model.IsSetParamForElements && string.IsNullOrEmpty(model.SetParameterName))
             {
+                // Для элементов категории "{0}" не задан целевой параметр для записи результат
                 _resultService.Add(
                     string.Format(
                         Language.GetItem("t6"),

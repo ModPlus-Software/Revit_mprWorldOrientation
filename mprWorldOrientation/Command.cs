@@ -20,7 +20,7 @@ public class Command : IExternalCommand
         try
         {
 #if !DEBUG
-            ModPlusAPI.Statistic.SendCommandStarting(new ModPlusConnector());
+            ModPlusAPI.Statistic.SendCommandStarting(ModPlusConnector.Instance);
 #endif
             var window = new MainWindow();
             window.DataContext = new MainContext(window);

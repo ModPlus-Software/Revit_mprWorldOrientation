@@ -38,8 +38,8 @@ public class GetElementService
     public List<RoomWrapper> GetRoomWrapper(SettingsData settings, ScopeType scopeType)
     {
         var roomWrappers = GetScopedCollector(scopeType).WhereElementIsNotElementType()
-            .Where(i => settings.ElementApplyFilterForRooms.Filter.EqualityParameters.Any() ?
-                        settings.ElementApplyFilterForRooms.Filter.IsMatch(i) : true)
+            .Where(i => !settings.ElementApplyFilterForRooms.Filter.EqualityParameters.Any() || 
+                        settings.ElementApplyFilterForRooms.Filter.IsMatch(i))
             .OfType<Room>()
             .Select(i => new RoomWrapper(i))
             .ToList();
