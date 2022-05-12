@@ -69,7 +69,7 @@ public class ElementWrapper
             {
                 var locationLine = ((LocationCurve)glassWall.Location).Curve;
                 var locationDir = (locationLine.GetEndPoint(1) - locationLine.GetEndPoint(0)).Normalize();
-                var centralPoint = locationLine.GetEndPoint(0) + (locationDir * locationLine.ApproximateLength / 2);
+                var centralPoint = locationLine.Evaluate(0.5, true);
                 var centralPointUp = centralPoint + (XYZ.BasisZ * 1000.MmToFt());
                 var firstDir = locationDir.CrossProduct(XYZ.BasisZ);
                 var secondDir = -firstDir;
