@@ -61,8 +61,8 @@ public class ElementWrapper
 
     private List<Line> GetRayVectors(Element element)
     {
-        Line firstLine = null;
-        Line secondLine = null;
+        Line firstLine;
+        Line secondLine;
         switch (element)
         {
             case Wall glassWall:
@@ -87,6 +87,9 @@ public class ElementWrapper
                 secondLine = Line.CreateBound(upLocPoint, upLocPoint - (fistDirection * _rayLength));
                 break;
             }
+
+            default:
+                throw new ArgumentOutOfRangeException($"Not supported type {element.GetType()}");
         }
 
         return new List<Line> { firstLine, secondLine };

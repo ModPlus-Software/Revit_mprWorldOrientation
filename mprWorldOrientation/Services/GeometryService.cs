@@ -11,7 +11,7 @@ using System.Linq;
 /// </summary>
 public class GeometryService
 {
-    private Lazy<Transform> _transform;
+    private readonly Lazy<Transform> _transform;
 
     /// <summary>
     /// ctor
@@ -87,11 +87,13 @@ public class GeometryService
 
     private Transform GetTransform(Document doc)
     {
-        var angle = new FilteredElementCollector(doc)
-           .OfCategory(BuiltInCategory.OST_ProjectBasePoint)
-           .Cast<BasePoint>()
-           .First()
-           .get_Parameter(BuiltInParameter.BASEPOINT_ANGLETON_PARAM).AsDouble();
+        var basePoint = new FilteredElementCollector(doc)
+            .OfCategory(BuiltInCategory.OST_ProjectBasePoint)
+            .Cast<BasePoint>()
+            .FirstOrDefault();
+        if (basePoint == null)
+            return Transform.Identity;
+        var angle = basePoint.get_Parameter(BuiltInParameter.BASEPOINT_ANGLETON_PARAM).AsDouble();
         return Transform.CreateRotation(XYZ.BasisZ, -angle);
     }
 }
