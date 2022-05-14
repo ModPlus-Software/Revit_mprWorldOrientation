@@ -68,37 +68,51 @@ public class GetElementService
                 {
                     SpatialElementBoundaryLocation = SpatialElementBoundaryLocation.Center
                 })
-            .SelectMany(i => i.Select(w => _doc.GetElement(w.ElementId))).OfType<Wall>().ToList();
+            .SelectMany(i => i.Select(GetElement)).Where(i => i.RevitElement is Wall).ToList();
 
         var glassWindow = settings.ElementApplyFilterForGlassWalls.IsEnabled 
-            ? allWalls.Where(i => i.CurtainGrid != null)
+            ? allWalls.Where(i => ((Wall)i.RevitElement).CurtainGrid != null)
                 .Where(i => !settings.ElementApplyFilterForGlassWalls.Filter.EqualityParameters.Any() || 
-                            settings.ElementApplyFilterForGlassWalls.Filter.IsMatch(i)) 
-            : new List<Wall>();
+                            settings.ElementApplyFilterForGlassWalls.Filter.IsMatch(i.RevitElement)) 
+            : new List<ElementWrapper>();
 
-        var elements = allWalls.Where(i => i.CurtainGrid == null)
-            .SelectMany(i => i.GetDependentElements(null))
-            .Select(id => _doc.GetElement(id)).ToList();
+        var elements = allWalls.Where(i => ((Wall)i.RevitElement).CurtainGrid == null)
+            .SelectMany(wallElement => wallElement.RevitElement.GetDependentElements(null)
+            .Select(id => new ElementWrapper(wallElement.Doc.GetElement(id), wallElement.RevitLink))).ToList();
         
         var doors = settings.ElementApplyFilterForDoors.IsEnabled 
             ? elements
-            .Where(i => i.Category != null && i.Category.Id != ElementId.InvalidElementId)
-            .Where(i => (BuiltInCategory)i.Category.Id.IntegerValue == settings.ElementApplyFilterForDoors.Category.BuiltInCategory)
+            .Where(i => i.RevitElement.Category != null 
+            && i.RevitElement.Category.Id != ElementId.InvalidElementId)
+            .Where(i => (BuiltInCategory)i.RevitElement.Category.Id.IntegerValue 
+            == settings.ElementApplyFilterForDoors.Category.BuiltInCategory)
                 .Where(i => !settings.ElementApplyFilterForDoors.Filter.EqualityParameters.Any() || 
-                            settings.ElementApplyFilterForDoors.Filter.IsMatch(i)) 
-            : new List<Element>();
+                            settings.ElementApplyFilterForDoors.Filter.IsMatch(i.RevitElement)) 
+            : new List<ElementWrapper>();
 
         var windows = settings.ElementApplyFilterForWindows.IsEnabled 
             ? elements
-            .Where(i => i.Category != null && i.Category.Id != ElementId.InvalidElementId)
-                .Where(i => (BuiltInCategory)i.Category.Id.IntegerValue == settings.ElementApplyFilterForWindows.Category.BuiltInCategory)
+            .Where(i => i.RevitElement.Category != null 
+            && i.RevitElement.Category.Id != ElementId.InvalidElementId)
+                .Where(i => (BuiltInCategory)i.RevitElement.Category.Id.IntegerValue 
+                == settings.ElementApplyFilterForWindows.Category.BuiltInCategory)
                 .Where(i => !settings.ElementApplyFilterForWindows.Filter.EqualityParameters.Any() ||
-                            settings.ElementApplyFilterForWindows.Filter.IsMatch(i)) 
-            : new List<Element>();
+                            settings.ElementApplyFilterForWindows.Filter.IsMatch(i.RevitElement)) 
+            : new List<ElementWrapper>();
 
-        return doors.Concat(glassWindow).Concat(windows).Distinct().Select(i => new ElementWrapper(i))
+        return doors.Concat(glassWindow).Concat(windows).Distinct()
             .Where(i => i.Vectors.Any(l => _geometryService.HasLineSolidIntersection(l, roomWrapper.Solid)))
             .ToList();
+    }
+
+    private ElementWrapper GetElement(BoundarySegment segment)
+    {
+        if (segment.LinkElementId == null || segment.LinkElementId == ElementId.InvalidElementId)
+            return new ElementWrapper(_doc.GetElement(segment.ElementId), null);
+
+        var linkedInstance = _doc.GetElement(segment.ElementId) as RevitLinkInstance;
+        var linkedDoc = linkedInstance.GetLinkDocument();
+        return new ElementWrapper(linkedDoc.GetElement(segment.LinkElementId), linkedInstance);
     }
 
     private FilteredElementCollector GetScopedCollector(ScopeType scope)
