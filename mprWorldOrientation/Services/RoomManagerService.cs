@@ -75,6 +75,9 @@ public class RoomManagerService
                 if (equivalentSettingModel == null)
                     continue;
 
+                if (dependentElement.RevitLink != null)
+                    continue;
+
                 if (equivalentSettingModel.IsSetParamForElements && !string.IsNullOrEmpty(equivalentSettingModel.SetParameterName))
                 {
                     if (SetParameter(

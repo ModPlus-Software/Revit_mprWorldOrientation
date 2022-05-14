@@ -18,11 +18,24 @@ public class ElementWrapper
     /// ctor
     /// </summary>
     /// <param name="element">Элемент</param>
-    public ElementWrapper(Element element)
+    /// <param name="revitLinkInstance">Связанный файл</param>
+    public ElementWrapper(Element element, RevitLinkInstance revitLinkInstance)
     {
         RevitElement = element;
         _lines = new Lazy<List<Line>>(() => GetRayVectors(element));
+        Doc = revitLinkInstance?.GetLinkDocument() ?? element.Document;
+        RevitLink = revitLinkInstance;
     }
+
+    /// <summary>
+    /// Связанный файл
+    /// </summary>
+    public RevitLinkInstance RevitLink { get; }
+
+    /// <summary>
+    /// Документ которому принадлежит элемент
+    /// </summary>
+    public Document Doc { get; }
 
     /// <summary>
     /// Элемент в представлении Ревит
@@ -63,6 +76,7 @@ public class ElementWrapper
     {
         Line firstLine;
         Line secondLine;
+        var transform = RevitLink == null ? Transform.Identity : RevitLink.GetTotalTransform();
         switch (element)
         {
             case Wall glassWall:
@@ -71,10 +85,11 @@ public class ElementWrapper
                 var locationDir = (locationLine.GetEndPoint(1) - locationLine.GetEndPoint(0)).Normalize();
                 var centralPoint = locationLine.Evaluate(0.5, true);
                 var centralPointUp = centralPoint + (XYZ.BasisZ * 1000.MmToFt());
+                var centralPointUpTr = transform.OfPoint(centralPointUp);
                 var firstDir = locationDir.CrossProduct(XYZ.BasisZ);
-                var secondDir = -firstDir;
-                firstLine = Line.CreateBound(centralPointUp, centralPointUp + (firstDir * _rayLength));
-                secondLine = Line.CreateBound(centralPointUp, centralPointUp + (secondDir * _rayLength));
+                var firstDirTr = transform.OfVector(firstDir).Normalize();
+                firstLine = Line.CreateBound(centralPointUpTr, centralPointUpTr + (firstDirTr * _rayLength));
+                secondLine = Line.CreateBound(centralPointUpTr, centralPointUpTr + (-firstDirTr * _rayLength));
                 break;
             }
 
@@ -82,9 +97,11 @@ public class ElementWrapper
             {
                 var locationPoint = ((LocationPoint)familyInstance.Location).Point;
                 var fistDirection = familyInstance.FacingOrientation;
+                var firstDirTr = transform.OfVector(fistDirection).Normalize();
                 var upLocPoint = locationPoint + (XYZ.BasisZ * 1000.MmToFt());
-                firstLine = Line.CreateBound(upLocPoint, upLocPoint + (fistDirection * _rayLength));
-                secondLine = Line.CreateBound(upLocPoint, upLocPoint - (fistDirection * _rayLength));
+                var upLocPointTr = transform.OfPoint(upLocPoint);
+                firstLine = Line.CreateBound(upLocPointTr, upLocPointTr + (firstDirTr * _rayLength));
+                secondLine = Line.CreateBound(upLocPointTr, upLocPointTr - (firstDirTr * _rayLength));
                 break;
             }
 
