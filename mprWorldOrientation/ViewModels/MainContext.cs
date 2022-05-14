@@ -167,7 +167,7 @@ public class MainContext : ObservableObject
                 transaction.Commit();
                 if (_resultService.Count(ModPlusAPI.Enums.ResultItemType.Error) > 0 
                 || _resultService.Count(ModPlusAPI.Enums.ResultItemType.Success) > 0)
-                    _resultService.Show(Language.GetItem("t5"));
+                    _resultService.Show(ModPlus.GetRevitWindowHandle());
             },
             () => transaction.RollBack(),
             () => _window.Close());
