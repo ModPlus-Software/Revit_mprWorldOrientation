@@ -4,6 +4,7 @@ using Autodesk.Revit.DB;
 using Models;
 using ModPlus_Revit;
 using ModPlus_Revit.Utils;
+using ModPlusAPI;
 using ModPlusAPI.Services;
 using System;
 using System.Collections.Generic;
@@ -79,7 +80,7 @@ public class GeometryService
         }
 
         _resultService.Add(
-            $"Не удалось определить направление для элемента {element.RevitElement.Id.IntegerValue}",
+            string.Format(Language.GetItem("t5"), element.RevitElement.Id.IntegerValue),
             ModPlusAPI.Enums.ResultItemType.Error);
 
         return string.Empty;
