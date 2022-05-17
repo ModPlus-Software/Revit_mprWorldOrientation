@@ -72,6 +72,11 @@ public class ElementWrapper
     /// </summary>
     public bool IsContourElement => HasFirstVectorIntersectedRoom != HasSecondVectorIntersectionRoom;
 
+    /// <summary>
+    /// Направления света
+    /// </summary>
+    public string WorldDirection { get; set; } = string.Empty;
+
     private List<Line> GetRayVectors(Element element)
     {
         Line firstLine;

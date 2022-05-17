@@ -78,12 +78,14 @@ public class RoomManagerService
                 if (dependentElement.RevitLink != null)
                     continue;
 
-                if (equivalentSettingModel.IsSetParamForElements && !string.IsNullOrEmpty(equivalentSettingModel.SetParameterName))
+                if (equivalentSettingModel.IsSetParamForElements 
+                    && !string.IsNullOrEmpty(equivalentSettingModel.SetParameterName)
+                    && !string.IsNullOrEmpty(dependentElement.WorldDirection))
                 {
                     if (SetParameter(
                         dependentElement.RevitElement,
                         equivalentSettingModel.SetParameterName.Trim(),
-                        uniqueOrientationValues))
+                        dependentElement.WorldDirection))
                     {
                         equivalentSettingModel.SetElementCount++;
                     }
@@ -156,21 +158,13 @@ public class RoomManagerService
 
             var wordSide = _geometryService.WorldDirectionByVector(outSideVector.Direction.Normalize());
             if (!string.IsNullOrEmpty(wordSide))
+            {
+                elementWrapper.WorldDirection = wordSide;
                 values.Add(wordSide);
+            }   
         }
 
         var worldSides = values.Distinct().ToList();
-        if (worldSides.Count == 2)
-        {
-            if (worldSides.Contains(PluginSettings.North) && worldSides.Contains(PluginSettings.East))
-                return PluginSettings.NorthEast;
-            if (worldSides.Contains(PluginSettings.North) && worldSides.Contains(PluginSettings.West))
-                return PluginSettings.NorthWest;
-            if (worldSides.Contains(PluginSettings.South) && worldSides.Contains(PluginSettings.East))
-                return PluginSettings.SouthEast;
-            if (worldSides.Contains(PluginSettings.South) && worldSides.Contains(PluginSettings.West))
-                return PluginSettings.SouthWest;
-        }
 
         return string.Join("+", worldSides).Trim('+');
     }

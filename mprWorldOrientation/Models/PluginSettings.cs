@@ -1,6 +1,7 @@
 ﻿namespace mprWorldOrientation.Models;
 
 using ModPlusAPI;
+using System.Collections.Generic;
 
 /// <summary>
 /// Настройки для плагина
@@ -59,4 +60,19 @@ public static class PluginSettings
     /// </summary>
     /// "ЮВ"
     public static string SouthEast => Language.GetItem("s8");
+
+    /// <summary>
+    /// Список для вычисления векторов направления с правельным порядком присвоения
+    /// </summary>
+    public static List<string> DirectionOrderList => new List<string>()
+    {
+        NorthEast,
+        East,
+        SouthEast,
+        South,
+        SouthWest,
+        West,
+        NorthWest,
+        North
+    };
 }

@@ -3,7 +3,9 @@
 using Autodesk.Revit.DB;
 using Models;
 using ModPlus_Revit;
+using ModPlus_Revit.Utils;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 /// <summary>
@@ -12,6 +14,7 @@ using System.Linq;
 public class GeometryService
 {
     private readonly Lazy<Transform> _transform;
+    private Dictionary<string, (XYZ, XYZ)> _diapazones;
 
     /// <summary>
     /// ctor
@@ -20,6 +23,7 @@ public class GeometryService
     {
         var doc = ModPlus.UiApplication.ActiveUIDocument.Document;
         _transform = new Lazy<Transform>(() => GetTransform(doc));
+        _diapazones = GetDiapasones();
     }
 
     /// <summary>
@@ -58,7 +62,17 @@ public class GeometryService
     /// <returns>Сторона света</returns>
     public string WorldDirectionByVector(XYZ vector)
     {
+        var basic = _diapazones;
         vector = _transform.Value.OfVector(vector);
+        foreach (var diapasone in _diapazones)
+        {
+            var conectionLine = Line.CreateBound(diapasone.Value.Item1, diapasone.Value.Item2);
+            var vectorLine = Line.CreateBound(XYZ.Zero, vector);
+            var intersection = vectorLine.Intersect(conectionLine);
+            if (intersection == SetComparisonResult.Overlap)
+                return diapasone.Key;
+        }
+
         if (vector.IsAlmostEqualTo(XYZ.BasisY, PluginSettings.Tolerance))
             return PluginSettings.North;
         if (vector.IsAlmostEqualTo(-XYZ.BasisY, PluginSettings.Tolerance))
@@ -83,6 +97,29 @@ public class GeometryService
         }
 
         return string.Empty;
+    }
+
+    private XYZ Rotate(XYZ vector, double angle)
+    {
+        var x = (vector.X * Math.Cos(angle)) - (vector.Y * Math.Sin(angle));
+        var y = (vector.X * Math.Sin(angle)) + (vector.Y * Math.Cos(angle));
+        return new XYZ(x, y, 0).Normalize();
+    }
+
+    private Dictionary<string, (XYZ, XYZ)> GetDiapasones()
+    {
+        var result = new Dictionary<string, (XYZ, XYZ)>();
+        var basicVector = XYZ.BasisY;
+        var startAngle = 45 / 2;
+        var lastVector = Rotate(basicVector, -startAngle.DegreeToRadian());
+        foreach (var dir in PluginSettings.DirectionOrderList)
+        {
+            var localLastVector = Rotate(lastVector, -45.DegreeToRadian());
+            result.Add(dir, (lastVector, localLastVector));
+            lastVector = localLastVector;
+        }
+
+        return result;
     }
 
     private Transform GetTransform(Document doc)
