@@ -4,6 +4,8 @@ using Autodesk.Revit.DB;
 using Models;
 using ModPlus_Revit;
 using ModPlus_Revit.Utils;
+using ModPlusAPI;
+using ModPlusAPI.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,16 +16,19 @@ using System.Linq;
 public class GeometryService
 {
     private readonly Lazy<Transform> _transform;
-    private Dictionary<string, (XYZ, XYZ)> _diapazones;
+    private Lazy<Dictionary<string, (XYZ, XYZ)>> _ranges;
+    private ResultService _resultService;
 
     /// <summary>
     /// ctor
     /// </summary>
-    public GeometryService()
+    /// <param name="resultService">Логер</param>
+    public GeometryService(ResultService resultService)
     {
+        _resultService = resultService;
         var doc = ModPlus.UiApplication.ActiveUIDocument.Document;
         _transform = new Lazy<Transform>(() => GetTransform(doc));
-        _diapazones = GetDiapasones();
+        _ranges = new Lazy<Dictionary<string, (XYZ, XYZ)>>(GetRanges);
     }
 
     /// <summary>
@@ -59,42 +64,21 @@ public class GeometryService
     /// Определить сторону света по вектору
     /// </summary>
     /// <param name="vector">Вектор направления отверстия наружу</param>
+    /// <param name="element">Обертка над элементом</param>
     /// <returns>Сторона света</returns>
-    public string WorldDirectionByVector(XYZ vector)
+    public string WorldDirectionByVector(XYZ vector, ElementWrapper element)
     {
-        var basic = _diapazones;
         vector = _transform.Value.OfVector(vector);
-        foreach (var diapasone in _diapazones)
+        foreach (var range in _ranges.Value)
         {
-            var conectionLine = Line.CreateBound(diapasone.Value.Item1, diapasone.Value.Item2);
+            var connectionLine = Line.CreateBound(range.Value.Item1, range.Value.Item2);
             var vectorLine = Line.CreateBound(XYZ.Zero, vector);
-            var intersection = vectorLine.Intersect(conectionLine);
+            var intersection = vectorLine.Intersect(connectionLine);
             if (intersection == SetComparisonResult.Overlap)
-                return diapasone.Key;
+                return range.Key;
         }
 
-        if (vector.IsAlmostEqualTo(XYZ.BasisY, PluginSettings.Tolerance))
-            return PluginSettings.North;
-        if (vector.IsAlmostEqualTo(-XYZ.BasisY, PluginSettings.Tolerance))
-            return PluginSettings.South;
-        if (vector.IsAlmostEqualTo(XYZ.BasisX, PluginSettings.Tolerance))
-            return PluginSettings.East;
-        if (vector.IsAlmostEqualTo(-XYZ.BasisX, PluginSettings.Tolerance))
-            return PluginSettings.West;
-        if (vector.X < 0)
-        {
-            if (vector.Y > 0)
-                return PluginSettings.NorthWest;
-            if (vector.Y < 0)
-                return PluginSettings.SouthWest;
-        }
-        else
-        {
-            if (vector.Y > 0)
-                return PluginSettings.NorthEast;
-            if (vector.Y < 0)
-                return PluginSettings.SouthEast;
-        }
+        _resultService.Add(Language.GetItem("t5"), element.RevitElement.Id.ToString(), ModPlusAPI.Enums.ResultItemType.Error);
 
         return string.Empty;
     }
@@ -106,7 +90,7 @@ public class GeometryService
         return new XYZ(x, y, 0).Normalize();
     }
 
-    private Dictionary<string, (XYZ, XYZ)> GetDiapasones()
+    private Dictionary<string, (XYZ, XYZ)> GetRanges()
     {
         var result = new Dictionary<string, (XYZ, XYZ)>();
         var basicVector = XYZ.BasisY;

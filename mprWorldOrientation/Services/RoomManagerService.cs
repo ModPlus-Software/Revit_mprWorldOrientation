@@ -25,8 +25,8 @@ public class RoomManagerService
     /// <param name="resultService">Логер</param>
     public RoomManagerService(ResultService resultService)
     {
-        _geometryService = new GeometryService();
-        _getElementService = new GetElementService();
+        _geometryService = new GeometryService(resultService);
+        _getElementService = new GetElementService(resultService);
         _resultService = resultService;
     }
 
@@ -156,7 +156,8 @@ public class RoomManagerService
                 ? elementWrapper.SecondVector 
                 : elementWrapper.FirstVector;
 
-            var wordSide = _geometryService.WorldDirectionByVector(outSideVector.Direction.Normalize());
+            var wordSide = _geometryService.WorldDirectionByVector(
+                outSideVector.Direction.Normalize(), elementWrapper);
             if (!string.IsNullOrEmpty(wordSide))
             {
                 elementWrapper.WorldDirection = wordSide;
