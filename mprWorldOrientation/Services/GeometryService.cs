@@ -16,7 +16,7 @@ using System.Linq;
 public class GeometryService
 {
     private readonly Lazy<Transform> _transform;
-    private Lazy<Dictionary<string, (XYZ, XYZ)>> _diapazones;
+    private Lazy<Dictionary<string, (XYZ, XYZ)>> _ranges;
     private ResultService _resultService;
 
     /// <summary>
@@ -28,7 +28,7 @@ public class GeometryService
         _resultService = resultService;
         var doc = ModPlus.UiApplication.ActiveUIDocument.Document;
         _transform = new Lazy<Transform>(() => GetTransform(doc));
-        _diapazones = new Lazy<Dictionary<string, (XYZ, XYZ)>>(() => GetDiapasones());
+        _ranges = new Lazy<Dictionary<string, (XYZ, XYZ)>>(GetRanges);
     }
 
     /// <summary>
@@ -68,20 +68,17 @@ public class GeometryService
     /// <returns>Сторона света</returns>
     public string WorldDirectionByVector(XYZ vector, ElementWrapper element)
     {
-        var basic = _diapazones;
         vector = _transform.Value.OfVector(vector);
-        foreach (var diapasone in _diapazones.Value)
+        foreach (var range in _ranges.Value)
         {
-            var conectionLine = Line.CreateBound(diapasone.Value.Item1, diapasone.Value.Item2);
+            var connectionLine = Line.CreateBound(range.Value.Item1, range.Value.Item2);
             var vectorLine = Line.CreateBound(XYZ.Zero, vector);
-            var intersection = vectorLine.Intersect(conectionLine);
+            var intersection = vectorLine.Intersect(connectionLine);
             if (intersection == SetComparisonResult.Overlap)
-                return diapasone.Key;
+                return range.Key;
         }
 
-        _resultService.Add(
-            string.Format(Language.GetItem("t5"), element.RevitElement.Id.IntegerValue),
-            ModPlusAPI.Enums.ResultItemType.Error);
+        _resultService.Add(Language.GetItem("t5"), element.RevitElement.Id.ToString(), ModPlusAPI.Enums.ResultItemType.Error);
 
         return string.Empty;
     }
@@ -93,7 +90,7 @@ public class GeometryService
         return new XYZ(x, y, 0).Normalize();
     }
 
-    private Dictionary<string, (XYZ, XYZ)> GetDiapasones()
+    private Dictionary<string, (XYZ, XYZ)> GetRanges()
     {
         var result = new Dictionary<string, (XYZ, XYZ)>();
         var basicVector = XYZ.BasisY;
