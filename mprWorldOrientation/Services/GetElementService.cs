@@ -9,6 +9,7 @@ using Models;
 using Enums;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
+using ModPlusAPI.Services;
 
 /// <summary>
 /// Сервис по получению элементов
@@ -22,11 +23,11 @@ public class GetElementService
     /// <summary>
     /// ctor
     /// </summary>
-    public GetElementService()
+    public GetElementService(ResultService resultService)
     {
         _doc = ModPlus.UiApplication.ActiveUIDocument.Document;
         _uiDoc = ModPlus.UiApplication.ActiveUIDocument;
-        _geometryService = new GeometryService();
+        _geometryService = new GeometryService(resultService);
     }
 
     /// <summary>

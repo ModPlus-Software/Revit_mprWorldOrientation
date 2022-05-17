@@ -4,6 +4,7 @@ using Autodesk.Revit.DB;
 using Models;
 using ModPlus_Revit;
 using ModPlus_Revit.Utils;
+using ModPlusAPI.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,16 +15,19 @@ using System.Linq;
 public class GeometryService
 {
     private readonly Lazy<Transform> _transform;
-    private Dictionary<string, (XYZ, XYZ)> _diapazones;
+    private Lazy<Dictionary<string, (XYZ, XYZ)>> _diapazones;
+    private ResultService _resultService;
 
     /// <summary>
     /// ctor
     /// </summary>
-    public GeometryService()
+    /// <param name="resultService">Логер</param>
+    public GeometryService(ResultService resultService)
     {
+        _resultService = resultService;
         var doc = ModPlus.UiApplication.ActiveUIDocument.Document;
         _transform = new Lazy<Transform>(() => GetTransform(doc));
-        _diapazones = GetDiapasones();
+        _diapazones = new Lazy<Dictionary<string, (XYZ, XYZ)>>(() => GetDiapasones());
     }
 
     /// <summary>
@@ -59,12 +63,13 @@ public class GeometryService
     /// Определить сторону света по вектору
     /// </summary>
     /// <param name="vector">Вектор направления отверстия наружу</param>
+    /// <param name="element">Обертка над элементом</param>
     /// <returns>Сторона света</returns>
-    public string WorldDirectionByVector(XYZ vector)
+    public string WorldDirectionByVector(XYZ vector, ElementWrapper element)
     {
         var basic = _diapazones;
         vector = _transform.Value.OfVector(vector);
-        foreach (var diapasone in _diapazones)
+        foreach (var diapasone in _diapazones.Value)
         {
             var conectionLine = Line.CreateBound(diapasone.Value.Item1, diapasone.Value.Item2);
             var vectorLine = Line.CreateBound(XYZ.Zero, vector);
@@ -73,28 +78,9 @@ public class GeometryService
                 return diapasone.Key;
         }
 
-        if (vector.IsAlmostEqualTo(XYZ.BasisY, PluginSettings.Tolerance))
-            return PluginSettings.North;
-        if (vector.IsAlmostEqualTo(-XYZ.BasisY, PluginSettings.Tolerance))
-            return PluginSettings.South;
-        if (vector.IsAlmostEqualTo(XYZ.BasisX, PluginSettings.Tolerance))
-            return PluginSettings.East;
-        if (vector.IsAlmostEqualTo(-XYZ.BasisX, PluginSettings.Tolerance))
-            return PluginSettings.West;
-        if (vector.X < 0)
-        {
-            if (vector.Y > 0)
-                return PluginSettings.NorthWest;
-            if (vector.Y < 0)
-                return PluginSettings.SouthWest;
-        }
-        else
-        {
-            if (vector.Y > 0)
-                return PluginSettings.NorthEast;
-            if (vector.Y < 0)
-                return PluginSettings.SouthEast;
-        }
+        _resultService.Add(
+            $"Не удалось определить направление для элемента {element.RevitElement.Id.IntegerValue}",
+            ModPlusAPI.Enums.ResultItemType.Error);
 
         return string.Empty;
     }
