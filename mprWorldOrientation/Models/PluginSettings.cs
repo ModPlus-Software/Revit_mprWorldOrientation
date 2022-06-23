@@ -62,9 +62,9 @@ public static class PluginSettings
     public static string SouthEast => Language.GetItem("s8");
 
     /// <summary>
-    /// Список для вычисления векторов направления с правельным порядком присвоения
+    /// Список для вычисления векторов направления с правильным порядком присвоения
     /// </summary>
-    public static List<string> DirectionOrderList => new List<string>()
+    public static List<string> DirectionOrderList => new ()
     {
         NorthEast,
         East,

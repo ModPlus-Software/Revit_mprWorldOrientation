@@ -79,7 +79,8 @@ public class GetElementService
 
         var elements = allWalls.Where(i => ((Wall)i.RevitElement).CurtainGrid == null)
             .SelectMany(wallElement => wallElement.RevitElement.GetDependentElements(null)
-            .Select(id => new ElementWrapper(wallElement.Doc.GetElement(id), wallElement.RevitLink))).ToList();
+            .Select(id => wallElement.Doc.GetElement(id))
+            .Select(el => new ElementWrapper(el, wallElement.RevitLink))).ToList();
         
         var doors = settings.ElementApplyFilterForDoors.IsEnabled 
             ? elements
@@ -102,6 +103,7 @@ public class GetElementService
             : new List<ElementWrapper>();
 
         return doors.Concat(glassWindow).Concat(windows).Distinct()
+            .Where(i => i.IsValid)
             .Where(i => i.Vectors.Any(l => _geometryService.HasLineSolidIntersection(l, roomWrapper.Solid)))
             .ToList();
     }

@@ -21,11 +21,24 @@ public class ElementWrapper
     /// <param name="revitLinkInstance">Связанный файл</param>
     public ElementWrapper(Element element, RevitLinkInstance revitLinkInstance)
     {
-        RevitElement = element;
-        _lines = new Lazy<List<Line>>(() => GetRayVectors(element));
-        Doc = revitLinkInstance?.GetLinkDocument() ?? element.Document;
-        RevitLink = revitLinkInstance;
+        if (element == null)
+        {
+            IsValid = false;
+        }
+        else
+        {
+            RevitElement = element;
+            _lines = new Lazy<List<Line>>(() => GetRayVectors(element));
+            Doc = revitLinkInstance?.GetLinkDocument() ?? element.Document;
+            RevitLink = revitLinkInstance;
+            IsValid = true;
+        }
     }
+
+    /// <summary>
+    /// Является ли модель валидной
+    /// </summary>
+    public bool IsValid { get; }
 
     /// <summary>
     /// Связанный файл
@@ -100,10 +113,11 @@ public class ElementWrapper
 
             case FamilyInstance familyInstance:
             {
+                var category = (BuiltInCategory)familyInstance.Category.Id.IntegerValue;
                 var locationPoint = ((LocationPoint)familyInstance.Location).Point;
                 var fistDirection = familyInstance.FacingOrientation;
                 var firstDirTr = transform.OfVector(fistDirection).Normalize();
-                var upLocPoint = locationPoint + (XYZ.BasisZ * 1000.MmToFt());
+                var upLocPoint = locationPoint + (XYZ.BasisZ * (category == BuiltInCategory.OST_Windows ? 0 : 1000.MmToFt()));
                 var upLocPointTr = transform.OfPoint(upLocPoint);
                 firstLine = Line.CreateBound(upLocPointTr, upLocPointTr + (firstDirTr * _rayLength));
                 secondLine = Line.CreateBound(upLocPointTr, upLocPointTr - (firstDirTr * _rayLength));
