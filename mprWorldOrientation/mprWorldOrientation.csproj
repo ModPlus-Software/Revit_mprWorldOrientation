@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
 	<PropertyGroup>
-		<Version>1.1.7.0</Version>
+		<Version>1.1.8.0</Version>
 		<RootNamespace>mprWorldOrientation</RootNamespace>
 		<AssemblyName>$(RootNamespace)</AssemblyName>
 		<Configurations>Debug;R2017;R2018;R2019;R2020;R2021;R2022;R2023</Configurations>
@@ -81,42 +81,42 @@
 
 	<ItemGroup Condition="'$(Configuration)'=='R2017'">
 		<PackageReference Include="ModPlus.Revit.API.2017" Version="2.0.0" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlus.Revit.Module.2017" Version="11.6.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.Revit.Module.2017" Version="11.9.0" ExcludeAssets="runtime" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='R2018'">
 		<PackageReference Include="ModPlus.Revit.API.2018" Version="2.0.0" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlus.Revit.Module.2018" Version="11.6.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.Revit.Module.2018" Version="11.9.0" ExcludeAssets="runtime" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='R2019'">
 		<PackageReference Include="ModPlus.Revit.API.2019" Version="3.0.0" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlus.Revit.Module.2019" Version="11.6.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.Revit.Module.2019" Version="11.9.0" ExcludeAssets="runtime" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='R2020'">
 		<PackageReference Include="ModPlus.Revit.API.2020" Version="3.0.0" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlus.Revit.Module.2020" Version="11.6.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.Revit.Module.2020" Version="11.9.0" ExcludeAssets="runtime" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='R2021'">
 		<PackageReference Include="ModPlus.Revit.API.2021" Version="3.0.0" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlus.Revit.Module.2021" Version="11.6.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.Revit.Module.2021" Version="11.9.0" ExcludeAssets="runtime" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='R2022'">
 		<PackageReference Include="ModPlus.Revit.API.2022" Version="3.0.0" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlus.Revit.Module.2022" Version="11.6.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.Revit.Module.2022" Version="11.9.0" ExcludeAssets="runtime" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='R2023'">
 		<PackageReference Include="ModPlus.Revit.API.2023" Version="3.0.0" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlus.Revit.Module.2023" Version="11.6.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.Revit.Module.2023" Version="11.9.0" ExcludeAssets="runtime" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='Debug'">
 		<PackageReference Include="ModPlus.Revit.API.2023" Version="3.0.0" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlus.Revit.Module.2023" Version="11.6.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.Revit.Module.2023" Version="11.9.0" ExcludeAssets="runtime" />
 		<Reference Include="RevitGeometryExporter">
 			<HintPath>..\..\RevitExportGeometryToAutocad\RevitGeometryExporter\bin\Debug\RevitGeometryExporter.dll</HintPath>
 		</Reference>
@@ -124,8 +124,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="JetBrains.Annotations" Version="2022.1.0" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlusAPI" Version="8.11.0" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlusStyle" Version="4.2.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlusAPI" Version="9.7.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlusStyle" Version="4.3.0" ExcludeAssets="runtime" />
 		<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

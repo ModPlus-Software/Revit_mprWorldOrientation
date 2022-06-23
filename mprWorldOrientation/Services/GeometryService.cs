@@ -16,8 +16,8 @@ using System.Linq;
 public class GeometryService
 {
     private readonly Lazy<Transform> _transform;
-    private Lazy<Dictionary<string, (XYZ, XYZ)>> _ranges;
-    private ResultService _resultService;
+    private readonly Lazy<Dictionary<string, (XYZ, XYZ)>> _ranges;
+    private readonly ResultService _resultService;
 
     /// <summary>
     /// ctor
