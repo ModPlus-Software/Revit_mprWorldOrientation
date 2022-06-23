@@ -56,8 +56,8 @@ public class GeometryService
         }
 
         // в случаях с дуговыми объектами, предполагаем что если пересечение и найдено,
-        // но сумма длин сегментов меньше 70 процентов линии, то линия смотри наружу объекта и 
-        return line.ApproximateLength * 0.7 < commonLength;
+        // но сумма длин сегментов меньше 60 процентов линии, то линия смотри наружу объекта и 
+        return line.ApproximateLength * 0.6 < commonLength;
     }
 
     /// <summary>
